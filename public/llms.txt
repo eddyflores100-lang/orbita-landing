@@ -1,0 +1,117 @@
+# ÓRBITA — Property Content Engine
+# https://orbita.alicelabs.site
+# Built by AliceLabs LLC (Sheridan, Wyoming, USA)
+
+> ÓRBITA turns a property's photos into AI cinematic video, an interactive 3D tour, a public microsite with QR and per-property analytics — in minutes, no production crew required.
+
+## Capabilities (what ÓRBITA does)
+
+1. **AI Property Understanding** — Visual analysis of photos with GLM-4.5v: detects rooms (15 categories), objects, lighting, architectural style and generates an automatic description.
+2. **AI Director** — LLM plans shot order, camera moves (11 types), durations, captions and narrative tone (8 profiles: luxury, casual, boutique, etc.).
+3. **CogVideoX-3 Image-to-Video** — Each photo is turned into a 5s cinematic clip with an auto-built prompt (place + camera + atmosphere + quality guards).
+4. **Procedural Music** — 16-bit stereo PCM WAV synthesis with 6 musical styles, chord progressions, ADSR, arpeggio panning. No third-party licenses.
+5. **AI Voiceover** — LLM writes a script calibrated to ~2.6 words/second. TTS with 4 voices. Automatic sidechain ducking (music dips under voice).
+6. **3D Point-Cloud Tour** — Three.js / WebGL with Depth Anything V2 (94MB ONNX) for monocular depth. Drag-to-look, wheel/pinch, mobile gyroscope. Labeled hotspots.
+7. **Public microsite** — Next.js SSR at /p/[slug] with hero, video player, 3D tour, gallery lightbox, WhatsApp CTA, contact form and event tracking.
+8. **Dynamic QR** — 640px PNG with error correction M, deep-link to /p/[slug]?ref=qr for lead attribution tracking.
+9. **Analytics** — 14 days of daily views + byRef (qr/instagram/whatsapp) + counts per event (VIEW, VIDEO_PLAY, CTA, WHATSAPP, SCAN, CONTACT).
+
+## Agent-facing entry points (for AI agents)
+
+- OpenAPI 3.1 spec: https://orbita.alicelabs.site/openapi.json
+- MCP server (HTTP JSON-RPC 2.0): https://orbita.alicelabs.site/api/mcp
+- AI plugin manifest (ChatGPT/OpenAI): https://orbita.alicelabs.site/.well-known/ai-plugin.json
+- Agents.txt (AI crawler policy): https://orbita.alicelabs.site/agents.txt
+- Security policy: https://orbita.alicelabs.site/.well-known/security.txt
+- Demo microsite (live): https://orbita.alicelabs.site/p/la-floresta-199
+- GitHub source: https://github.com/eddyflores100-lang/Orbita
+- AliceLabs LLC: https://alicelabs.site
+
+## Technical pipeline (high level)
+
+```
+INPUT (photos/ZIP/URL)
+  → INGEST (sharp EXIF rotate + sha-256 dedupe + thumbnail)
+  → UNDERSTAND (GLM-4.5v vision)
+  → DIRECT (LLM plan JSON)
+  → RENDER PER SHOT (CogVideoX-3 i2v 5s clips, cached by SHA-1)
+  → ENCODE (ffmpeg xfade montage + concat fallback)
+  → SOUNDTRACK (procedural PCM WAV 16-bit stereo, 6 styles)
+  → VOICEOVER (LLM script + TTS + sidechain ducking)
+  → MASTER (ffmpeg +faststart + optional watermark)
+  → OUTPUT (MP4 H.264 30fps + 3D tour + microsite + QR + analytics)
+```
+
+## Stack
+
+- **Framework**: Next.js 16 App Router + React 19 + TypeScript 5
+- **Styling**: Tailwind CSS 4 + shadcn/ui (New York)
+- **DB**: Prisma ORM + SQLite
+- **AI**: z-ai-web-dev-sdk@0.0.18 (CogVideoX-3, GLM-4.5v, LLM chat, TTS, async polling)
+- **Image**: sharp (EXIF, resize, jpeg q90, thumbnails)
+- **Video**: FFmpeg + ffprobe (xfade montage, sidechain duck, watermark, faststart)
+- **3D**: Three.js (point-cloud viewer) + Depth Anything V2 (ONNX)
+- **QR**: qrcode@1.5.4 (PNG, error correction M)
+- **ZIP**: fflate (pure JS, no native deps)
+- **Crypto (Bóveda sister product)**: WebCrypto PBKDF2(310k) + AES-GCM-256
+
+## Accepted inputs
+
+- Photos: JPG, PNG, WebP, HEIC, HEIF, TIFF, GIF, BMP, AVIF (min 500B)
+- ZIP (up to 40 photos per request)
+- URL: direct image or web page (extraction of og:image + JSON-LD + <img src> with anti-noise filter)
+- Metadata: name (required), address, tone (8 types), aspect (16:9/9:16/1:1), brand color, host info, CTA text, watermark, features, logline, music style + BPM + volume, voiceover toggle + voice, hotspots JSON (up to 24KB)
+
+## Outputs
+
+- MP4 H.264 yuv420p 30fps +faststart (16:9, 9:16, 1:1)
+- 3D interactive tour (WebGL point cloud)
+- Public microsite SSR /p/[slug]
+- QR PNG 640px (dynamic, ?ref=qr)
+- 14-day analytics JSON
+
+## 8 available tones
+
+- luxury — "A residence designed for those who refuse to compromise on detail."
+- casual — "Your next home is ready to move in and enjoy."
+- boutique — architectural and heritage sensibility
+- airbnb-friendly — vacation rentals
+- modern — contemporary architecture
+- colonial — heritage homes
+- beach — beachfront properties
+- urban — central apartments
+
+## Pricing
+
+- Starter: $19/property (1 property, 3 formats, 14-day analytics)
+- Pro: $49/property (luxury tone, voiceover, procedural music, 60-day analytics, WhatsApp tracking)
+- Agency: $199/mo (20 properties, white-label, multi-agent, API + MCP)
+- Enterprise: Custom (self-hosted, multi-country, SLA, ISO/IEC readiness)
+
+## Use cases by industry
+
+- Independent brokerages (LATAM, USA Hispanic markets)
+- Individual residential agents (Instagram-driven)
+- Luxury agents (international buyers)
+- Beach & Airbnb agents (Reels-driven)
+- Real estate developers (project pre-sale)
+- Real estate marketing agencies (white-label)
+
+## Geo coverage (50+ cities)
+
+USA (Hispanic): Miami, Houston, Los Angeles, Dallas-Fort Worth, San Antonio, San Diego, Phoenix, Las Vegas, Riverside, Austin, Chicago, New York, Orlando, Tampa, Denver, Atlanta, Charlotte, El Paso, Albuquerque, Boston, Washington DC, Seattle, Fort Lauderdale, Naples
+Ecuador: Quito, Guayaquil, Cuenca, Manta, Loja, Ambato, Santo Domingo
+Peru: Lima, Arequipa, Cusco, Trujillo, Chiclayo, Piura
+Colombia: Bogota, Medellin, Cali, Cartagena, Barranquilla
+Mexico: CDMX, Guadalajara, Monterrey, Merida, Cancun
+Argentina: Buenos Aires, Cordoba, Rosario, Mendoza
+Chile: Santiago, Valparaiso, Concepcion
+Spain: Madrid, Barcelona, Valencia, Sevilla, Malaga
+
+## Contact
+
+- Sales: hello@alicelabs.site
+- GitHub: https://github.com/eddyflores100-lang
+- Org (canonical): https://github.com/alicelabs-llc
+- Country: USA (Wyoming LLC)
+- Operations: USA-first, English-native, bilingual (es/en)

@@ -1,0 +1,21 @@
+# =====================================================
+# Órbita — Cloudflare Pages config
+# =====================================================
+# This file configures Cloudflare Pages deployment.
+# Project will be live at https://orbita.pages.dev
+# =====================================================
+
+name = "orbita"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".next"
+account_id = ""
+
+# Environment variables that are safe to be public (NO secrets here)
+# For secrets, use `wrangler pages secret put KEY` or the Cloudflare dashboard
+[vars]
+NEXT_PUBLIC_APP_URL = "https://orbita.pages.dev"
+
+# Build configuration
+[build]
+command = "bun run pages:build"

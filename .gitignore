@@ -1,0 +1,72 @@
+# === Next.js ===
+/.next/
+/out/
+/build
+
+# === Dependencies ===
+node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# === Production ===
+/coverage
+*.pem
+
+# === Debug ===
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev.log
+server.log
+
+# === Env (NEVER commit secrets) ===
+.env
+.env.*
+!.env.example
+
+# === Sandbox / IDE / OS ===
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+.zscripts/
+tool-results/
+
+# === Sandbox-only — NOT part of Órbita source ===
+skills/
+mini-services/
+tests/
+examples/
+tool-results/
+worklog.md
+.zscripts/
+
+# === Database (local SQLite) ===
+db/*.db
+db/*.db-journal
+db/*.db-wal
+db/*.db-shm
+
+# === Cloudflare / Wrangler ===
+.wrangler/
+.dev.vars
+
+# === Build artifacts ===
+*.tsbuildinfo
+next-env.d.ts
+
+# === Download folder (large screenshots, not part of source) ===
+download/*.png
+download/*.jpg
+download/*.mp4
+
+# === Misc ===
+.cache/
+.eslintcache
+*.log

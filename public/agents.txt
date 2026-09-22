@@ -1,0 +1,173 @@
+# agents.txt — AI crawler & agent policy for ÓRBITA
+# https://orbita.alicelabs.site
+# Maintained by AliceLabs LLC (hello@alicelabs.site)
+
+# ============ Allowlist (crawlers that MAY index) ============
+
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /openapi.json
+Disallow: /*.json
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+Crawl-delay: 1
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+Crawl-delay: 1
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+Crawl-delay: 1
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+Crawl-delay: 1
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /p/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /p/
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json
+
+User-agent: FacebookBot
+Allow: /
+Disallow: /api/
+
+User-agent: Twitterbot
+Allow: /
+Disallow: /api/
+
+User-agent: LinkedInBot
+Allow: /
+Disallow: /api/
+
+# ============ Blocklist (data brokers with no value for agents) ============
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: AppleBot
+Allow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+
+User-agent: Diffbot
+Allow: /
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: omgili
+Disallow: /
+
+User-agent: omgilibot
+Disallow: /
+
+User-agent: PiplBot
+Disallow: /
+
+User-agent: Scooter
+Disallow: /
+
+User-agent:SeekportBot  
+Disallow: /
+
+User-agent: Yahoo! Slurp
+Allow: /
+
+# ============ Default policy ============
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /p/
+Disallow: /*.json$
+Disallow: /*.mp4$
+Disallow: /*.png$
+Disallow: /admin/
+Crawl-delay: 2
+
+# ============ Sitemap ============
+
+Sitemap: https://orbita.alicelabs.site/sitemap.xml
+Sitemap: https://orbita.alicelabs.site/sitemap-main.xml
+Sitemap: https://orbita.alicelabs.site/sitemap-usa.xml
+Sitemap: https://orbita.alicelabs.site/sitemap-latam.xml
+Sitemap: https://orbita.alicelabs.site/sitemap-images.xml
+Sitemap: https://orbita.alicelabs.site/sitemap-news.xml
+
+# ============ AI agent entry points (well-known) ============
+
+# OpenAPI 3.1 specification:
+# https://orbita.alicelabs.site/openapi.json
+
+# ChatGPT/OpenAI plugin manifest:
+# https://orbita.alicelabs.site/.well-known/ai-plugin.json
+
+# MCP server (HTTP JSON-RPC 2.0):
+# https://orbita.alicelabs.site/api/mcp
+
+# LLMs.txt (project summary for LLMs):
+# https://orbita.alicelabs.site/llms.txt
+
+# Security policy:
+# https://orbita.alicelabs.site/.well-known/security.txt

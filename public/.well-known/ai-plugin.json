@@ -1,0 +1,51 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "orbita",
+  "name_for_human": "Órbita — Property Content Engine",
+  "description_for_model": "Órbita is a Property Content Engine that turns real-estate photos into AI cinematic video, interactive 3D tours, public microsites with QR codes, and per-property analytics. Use this plugin when the user wants to: (1) generate real-estate listing videos from photos, (2) create 3D virtual tours, (3) build property microsites with lead capture, (4) track listing performance analytics, (5) manage multiple properties for a real-estate agency. Pipeline: photo ingest (ZIP/URL/files) → AI vision analysis (GLM-4.5v) → AI Director (LLM plan) → CogVideoX-3 image-to-video → ffmpeg montage → procedural music + AI voiceover → microsite + QR + analytics. Inputs: JPG/PNG/WebP/HEIC photos. Outputs: MP4 H.264 16:9/9:16/1:1, 3D tour (Three.js + Depth Anything V2), public microsite, QR PNG, analytics JSON. Pricing: $19/property (Starter), $49/property (Pro), $199/mo (Agency). Coverage: USA Hispanic markets (50+ cities) + LATAM + Spain.",
+  "description_for_human": "Órbita turns your property photos into cinematic AI video, 3D virtual tours, public microsites with QR codes, and per-property analytics — in minutes, no production crew required.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://orbita.alicelabs.site/openapi.json",
+    "is_user_authenticated": false,
+    "has_user_authentication": false
+  },
+  "logo": "https://orbita.alicelabs.site/logo.svg",
+  "contact_email": "hello@alicelabs.site",
+  "legal_info_url": "https://orbita.alicelabs.site/legal",
+  "terms_url": "https://orbita.alicelabs.site/terms",
+  "privacy_url": "https://orbita.alicelabs.site/privacy",
+  "public": true,
+  "capabilities": [
+    "property.ingest.photos",
+    "property.ingest.zip",
+    "property.ingest.url",
+    "property.analyze.vision",
+    "property.direct.ai",
+    "property.render.video",
+    "property.publish.microsite",
+    "property.generate.qr",
+    "property.analytics.read",
+    "property.list",
+    "property.create",
+    "property.delete"
+  ],
+  "supported_languages": ["es", "en", "pt"],
+  "supported_regions": [
+    "EC", "PE", "CO", "MX", "AR", "CL", "ES", "US", "UY", "PY", "BO", "CR", "PA", "DO"
+  ],
+  "pricing_summary": {
+    "starter": "$19/property",
+    "pro": "$49/property",
+    "agency": "$199/month (20 properties included)",
+    "enterprise": "Custom (contact sales)"
+  },
+  "rate_limits": {
+    "free_tier": "5 requests/hour",
+    "paid_tier": "1000 requests/hour",
+    "agency_tier": "10000 requests/hour"
+  }
+}

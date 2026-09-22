@@ -1,0 +1,71 @@
+# =====================================================
+# Órbita — Auto-deploy to Cloudflare Pages on every push
+# =====================================================
+# Workflow: push to main → Cloudflare Pages auto-build → live at orbita.pages.dev
+# Setup: add repository secrets CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID
+# =====================================================
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    name: Build & deploy to orbita.pages.dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Cache .next build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}-
+
+      - name: Lint check (must pass before deploy)
+        run: bun run lint
+
+      - name: Build for Cloudflare Pages
+        run: bun run pages:build
+        env:
+          NEXT_PUBLIC_APP_URL: https://orbita.pages.dev
+          ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
+          NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vercel/output/static --project-name=orbita --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Sitemap ping (Google + Bing + Yandex)
+        run: |
+          curl -sS "https://www.google.com/ping?sitemap=https://orbita.pages.dev/sitemap.xml" || true
+          curl -sS "https://www.bing.com/ping?sitemap=https://orbita.pages.dev/sitemap.xml" || true
+          curl -sS "https://webmaster.yandex.com/ping?sitemap=https://orbita.pages.dev/sitemap.xml" || true
+        continue-on-error: true
