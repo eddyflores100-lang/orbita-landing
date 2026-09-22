@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
 export const dynamic = "force-static"
+export const runtime = "edge"
 
 const openApiSpec = {
   openapi: "3.1.0",

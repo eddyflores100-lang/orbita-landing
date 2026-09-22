@@ -134,7 +134,7 @@ export function OrbitaDemo() {
               <div className="flex items-start gap-3">
                 <div className="relative w-16 h-28 rounded-md overflow-hidden border border-zinc-800 bg-zinc-900 flex-shrink-0">
                   <video
-                    src="/orbita/demo/la-floresta-916.mp4"
+                    src="https://github.com/eddyflores100-lang/Orbita/releases/download/demo-3d-real/ORBITA_3D_LaFloresta_916_Reels.mp4"
                     autoPlay
                     muted
                     loop
