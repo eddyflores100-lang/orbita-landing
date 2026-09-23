@@ -43,7 +43,7 @@ export function GET() {
   const urls = newsItems
     .map(
       (n) => `  <url>
-    <loc>${BASE_URL}/news#${n.slug}</loc>
+    <loc>${BASE_URL}/news/${n.slug}</loc>
     <lastmod>${n.date}T00:00:00Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
