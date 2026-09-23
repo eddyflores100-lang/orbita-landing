@@ -53,8 +53,9 @@ db/*.db-journal
 db/*.db-wal
 db/*.db-shm
 
-# === Cloudflare / Wrangler ===
+# === Cloudflare / Wrangler / Vercel build output ===
 .wrangler/
+.vercel/
 .dev.vars
 
 # === Build artifacts ===
