@@ -1,24 +1,17 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="orbit-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#34D399"/>
-      <stop offset="50%" stop-color="#22D3EE"/>
-      <stop offset="100%" stop-color="#FBBF24"/>
+    <linearGradient id="gold-grad" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#f2ca50"/>
+      <stop offset="50%" stop-color="#e4c287"/>
+      <stop offset="100%" stop-color="#d4af37"/>
     </linearGradient>
-    <radialGradient id="orbit-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#34D399" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#34D399" stop-opacity="0"/>
-    </radialGradient>
   </defs>
-  <!-- Glow halo -->
-  <circle cx="32" cy="32" r="30" fill="url(#orbit-glow)"/>
-  <!-- Outer orbital ring -->
-  <ellipse cx="32" cy="32" rx="28" ry="14" stroke="url(#orbit-grad)" stroke-width="2.5" fill="none" transform="rotate(-25 32 32)" stroke-linecap="round"/>
-  <!-- Middle ring -->
-  <ellipse cx="32" cy="32" rx="20" ry="10" stroke="#22D3EE" stroke-width="2" fill="none" transform="rotate(35 32 32)" stroke-linecap="round" opacity="0.7"/>
-  <!-- Inner orbiting dot -->
-  <circle cx="50" cy="22" r="4" fill="url(#orbit-grad)"/>
-  <!-- Center nucleus -->
-  <circle cx="32" cy="32" r="6" fill="url(#orbit-grad)"/>
-  <circle cx="30" cy="30" r="2" fill="#FFFFFF" opacity="0.6"/>
+  <!-- Outer ring (orbit) -->
+  <circle cx="32" cy="32" r="28" stroke="url(#gold-grad)" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <!-- Orbital ellipse (tilted) -->
+  <ellipse cx="32" cy="32" rx="26" ry="12" stroke="url(#gold-grad)" stroke-width="2" fill="none" transform="rotate(-30 32 32)"/>
+  <!-- Orbiting dot -->
+  <circle cx="52" cy="22" r="3" fill="url(#gold-grad)"/>
+  <!-- Center monogram -->
+  <text x="32" y="42" font-family="Bodoni Moda, serif" font-size="28" font-style="italic" font-weight="400" fill="url(#gold-grad)" text-anchor="middle">Ó</text>
 </svg>
