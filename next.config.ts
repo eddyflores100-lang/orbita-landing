@@ -1,50 +1,40 @@
 import type { NextConfig } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://orbita.pages.dev";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://orbita.alicelabs.site";
 
 const nextConfig: NextConfig = {
-  // Cloudflare Pages: use standalone for @cloudflare/next-on-pages adapter
   output: "standalone",
-
-  // Production: surface type errors instead of swallowing them
-  typescript: {
-    ignoreBuildErrors: false,
-  },
-
-  // Re-enable React dev-time bug detection
+  typescript: { ignoreBuildErrors: false },
   reactStrictMode: true,
-
-  // Power Google search result rich snippets
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
-
-  // SEO + security headers (deployed via Cloudflare Pages)
+  // Serve the exact HTML from the zip at / (copia letra por letra)
+  async rewrites() {
+    return [
+      { source: "/", destination: "/orbita-landing.html" },
+    ];
+  },
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          // HSTS — enforce HTTPS for 2 years, include subdomains, preload list eligible
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-          // Clickjacking protection
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          // MIME-type sniffing protection
           { key: "X-Content-Type-Options", value: "nosniff" },
-          // Referrer policy — strip query string when leaving HTTPS
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          // Permissions policy — disable camera, microphone, geolocation unless user-granted
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()" },
-          // Content Security Policy — allow inline scripts/styles (Next.js needs them) + Cloudflare challenge
+          // CSP allows: self + Tailwind CDN + Google Fonts + Google images (property photos) + Cloudflare challenge
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://challenges.cloudflare.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "media-src 'self' https: blob:",
-              "font-src 'self' data:",
+              "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
               "connect-src 'self' https: wss:",
               "frame-ancestors 'self'",
               "form-action 'self' https:",
@@ -53,20 +43,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Cache static assets aggressively
+      {
+        source: "/orbita-landing.html",
+        headers: [{ key: "Cache-Control", value: "public, max-age=3600, must-revalidate" }],
+      },
       {
         source: "/orbita/demo/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
-      {
-        source: "/_next/static/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
-      },
     ];
   },
-
-  // Allow @cloudflare/next-on-pages to find routes
-  // (no rewrites needed — Next.js App Router handles /inmobiliaria/[city] natively)
 };
 
 export default nextConfig;

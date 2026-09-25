@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Órbita Property Engine · Consola de Ultra Lujo &amp; IA Inmobiliaria</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-base": "#05070B",
+            "surface-dim": "#080C12",
+            "surface-raised": "#0D131D",
+            "surface-elevated": "#141C2B",
+            "surface-bright": "#1F2B3E",
+            "primary": "#10B981",
+            "primary-glow": "#34D399",
+            "primary-fixed": "#6ee7b7",
+            "cyan-glow": "#06B6D4",
+            "cyan-light": "#22D3EE",
+            "champagne": "#F59E0B",
+            "champagne-light": "#FCD34D",
+            "on-surface": "#E2E8F0",
+            "on-surface-variant": "#94A3B8",
+            "border-subtle": "rgba(255, 255, 255, 0.07)",
+            "border-specular": "rgba(255, 255, 255, 0.16)",
+            "border-emerald": "rgba(16, 185, 129, 0.35)",
+            "border-cyan": "rgba(6, 182, 212, 0.35)"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          },
+          animation: {
+            'aurora-1': 'auroraOne 22s ease-in-out infinite alternate',
+            'aurora-2': 'auroraTwo 26s ease-in-out infinite alternate',
+            'pulse-glow': 'pulseGlow 4s ease-in-out infinite',
+            'float-slow': 'floatSlow 7s ease-in-out infinite'
+          },
+          keyframes: {
+            auroraOne: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '50%': { transform: 'translate(60px, -40px) scale(1.2)' },
+              '100%': { transform: 'translate(-30px, 30px) scale(0.95)' }
+            },
+            auroraTwo: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '50%': { transform: 'translate(-50px, 50px) scale(1.15)' },
+              '100%': { transform: 'translate(40px, -30px) scale(0.9)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4', filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.3))' },
+              '50%': { opacity: '0.9', filter: 'drop-shadow(0 0 35px rgba(6, 182, 212, 0.6))' }
+            },
+            floatSlow: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Obsidian Luxury Pro Spec */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #05070B; }
+    ::-webkit-scrollbar-thumb { background: #182234; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+    .cinema-mesh {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                        radial-gradient(rgba(16, 185, 129, 0.05) 1.5px, transparent 1.5px);
+      background-size: 32px 32px, 96px 96px;
+      background-position: 0 0, 16px 16px;
+    }
+
+    .luxury-glass {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.72) 0%, rgba(9, 13, 20, 0.88) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+
+    .luxury-glass:hover {
+      border-color: rgba(52, 211, 153, 0.35);
+      box-shadow: 0 25px 60px -10px rgba(16, 185, 129, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .specular-border {
+      position: relative;
+    }
+    .specular-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(16, 185, 129, 0.4) 40%, rgba(6, 182, 212, 0.2) 70%, transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* 3D Perspective Playground */
+    .perspective-container {
+      perspective: 1400px;
+      perspective-origin: 50% 30%;
+    }
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    .stack-card {
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Tab Transition Cinema */
+    .tab-pane {
+      display: none;
+      opacity: 0;
+      transform: translateY(16px) scale(0.985);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .tab-pane.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .aspect-reel {
+      aspect-ratio: 9 / 16;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .aspect-cinema {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+    }
+    .aspect-square {
+      aspect-ratio: 1 / 1;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+  </style>
+
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/favicon-192.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#05070B" />
+<meta name="msapplication-TileColor" content="#05070B" />
+<meta name="msapplication-config" content="/browserconfig.xml" />
+</head>
+<body class="bg-surface-base text-on-surface font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary/25 selection:text-primary-glow">
+<!-- ILUMINACIÓN AMBIENTAL CINEMÁTICA Y ORBES AURORA DE ULTRA LUJO -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-40 left-1/4 w-[750px] h-[750px] bg-gradient-to-br from-primary/15 via-emerald-600/5 to-transparent rounded-full blur-[170px] animate-aurora-1"></div>
+<div class="absolute top-1/3 -right-36 w-[700px] h-[700px] bg-gradient-to-bl from-cyan-glow/15 via-cyan-500/5 to-transparent rounded-full blur-[180px] animate-aurora-2"></div>
+<div class="absolute -bottom-20 left-10 w-[550px] h-[550px] bg-champagne/10 rounded-full blur-[160px]"></div>
+<div class="absolute inset-0 cinema-mesh opacity-60"></div>
+<div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-surface-base via-surface-base/60 to-transparent"></div>
+</div>
+<!-- HEADER PRINCIPAL: OBSIDIAN CONSOLE & STATUS -->
+<header class="sticky top-0 z-50 w-full border-b border-white/10 bg-surface-base/80 backdrop-blur-2xl">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
+<!-- BRAND & STATUS HUD -->
+<div class="flex items-center gap-4 shrink-0">
+<div class="cursor-pointer transition-transform duration-300 hover:scale-[1.03]" onclick="switchTab('tab-studio')">
+          <img src="/logo.svg" alt="Órbita Property Engine" class="h-12 w-12 sm:h-14 sm:w-14" />
+        </div>
+<div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-white/10">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-raised/90 border border-primary/30 font-mono text-[11px] text-primary-glow shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-glow opacity-80"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="font-bold tracking-wider">18 MLS LIVE</span>
+</div>
+<span class="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-glow/10 border border-cyan-glow/20 font-mono text-[11px] text-cyan-light">
+            CogVideoX-3 &amp; Depth Anything V2
+          </span>
+</div>
+</div>
+<!-- BARRA DE NAVEGACIÓN FLOTANTE CINEMÁTICA CON 5 TABS -->
+<nav class="hidden lg:flex items-center p-1.5 rounded-2xl bg-surface-raised/80 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl" id="nav-tabs">
+<!-- Tab 1 -->
+<button class="nav-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 bg-primary text-surface-base shadow-[0_0_20px_rgba(16,185,129,0.45)]" id="btn-tab-studio" onclick="switchTab('tab-studio')">
+<span class="material-symbols-outlined text-[17px]">movie_filter</span>
+<span>Studio 3D</span>
+</button>
+<!-- Tab 2 -->
+<button class="nav-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300" id="btn-tab-market" onclick="switchTab('tab-market')">
+<span class="material-symbols-outlined text-[17px]">query_stats</span>
+<span>Mercado USA</span>
+</button>
+<!-- Tab 3 -->
+<button class="nav-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300" id="btn-tab-legal" onclick="switchTab('tab-legal')">
+<span class="material-symbols-outlined text-[17px]">gavel</span>
+<span>Legal &amp; Compliance</span>
+</button>
+<!-- Tab 4 -->
+<button class="nav-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300" id="btn-tab-pipeline" onclick="switchTab('tab-pipeline')">
+<span class="material-symbols-outlined text-[17px]">terminal</span>
+<span>Pipeline &amp; MCP</span>
+</button>
+<!-- Tab 5 -->
+<button class="nav-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300" id="btn-tab-pricing" onclick="switchTab('tab-pricing')">
+<span class="material-symbols-outlined text-[17px]">diamond</span>
+<span>Planes VIP</span>
+</button>
+</nav>
+<!-- ACCIONES: SELECTOR IDIOMA Y CTA DE ALTO VALOR -->
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-raised border border-white/10 rounded-xl p-1 text-xs font-mono">
+<button class="px-2.5 py-1 rounded-lg bg-surface-elevated text-primary-glow font-bold shadow-sm transition-all" id="lang-es" onclick="setLang('es')">ES</button>
+<button class="px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-white transition-all" id="lang-en" onclick="setLang('en')">EN</button>
+</div>
+<button class="group relative px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary via-primary-glow to-cyan-glow text-surface-base font-bold text-xs uppercase tracking-wider font-mono shadow-[0_0_25px_rgba(16,185,129,0.35)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] transition-all overflow-hidden" onclick="switchTab('tab-studio'); document.getElementById('uploader-card').scrollIntoView({behavior:'smooth'});">
+<div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+<span class="relative flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+            Comenzar Ahora
+          </span>
+</button>
+</div>
+</div>
+<!-- MÓVIL: BARRA HORIZONTAL DE PESTAÑAS -->
+<div class="flex lg:hidden overflow-x-auto px-4 py-2 gap-2 border-t border-white/5 bg-surface-raised/95 no-scrollbar">
+<button class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-surface-base" id="m-tab-studio" onclick="switchTab('tab-studio')">
+<span class="material-symbols-outlined text-[15px]">movie_filter</span> Studio
+      </button>
+<button class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant bg-surface-elevated" id="m-tab-market" onclick="switchTab('tab-market')">
+<span class="material-symbols-outlined text-[15px]">query_stats</span> Mercado
+      </button>
+<button class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant bg-surface-elevated" id="m-tab-legal" onclick="switchTab('tab-legal')">
+<span class="material-symbols-outlined text-[15px]">gavel</span> Legal
+      </button>
+<button class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant bg-surface-elevated" id="m-tab-pipeline" onclick="switchTab('tab-pipeline')">
+<span class="material-symbols-outlined text-[15px]">terminal</span> Pipeline
+      </button>
+<button class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant bg-surface-elevated" id="m-tab-pricing" onclick="switchTab('tab-pricing')">
+<span class="material-symbols-outlined text-[15px]">diamond</span> Precios
+      </button>
+</div>
+</header>
+<!-- CONTENEDOR PRINCIPAL MULTI-PESTAÑA -->
+<main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+<!-- =========================================================================
+         TAB 1: 🎬 STUDIO CINEMÁTICO & SIMULADOR 3D
+         ========================================================================= -->
+<section class="tab-pane active space-y-8" id="tab-studio">
+<!-- HERO TITULAR DE ULTRA IMPACTO -->
+<div class="text-center max-w-3xl mx-auto space-y-4 pt-3">
+<div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-raised border border-primary/30 shadow-[0_0_25px_rgba(16,185,129,0.2)]">
+<span class="w-2 h-2 rounded-full bg-primary-glow animate-pulse"></span>
+<span class="font-mono text-xs font-semibold text-primary-fixed uppercase tracking-wider">
+            Rolls Royce x Linear · Ultra Luxury Cinema Engine
+          </span>
+</div>
+<h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+          Ingesta fotos estáticas. <br/>
+<span class="bg-gradient-to-r from-primary via-primary-glow to-cyan-light bg-clip-text text-transparent drop-shadow-lg">
+            Órbita esculpe el tour hiperrealista.
+          </span>
+</h1>
+<p class="text-sm sm:text-base text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+          Para agentes de élite en EE.UU. Procesamiento de video 1080p, malla volumétrica WebGL monocular, micrositio bilingüe ES/EN y enrutador directo a WhatsApp en menos de 15 minutos.
+        </p>
+</div>
+<!-- WORKSPACE CINEMÁTICO: VISOR 3D & PANEL DE ACCIÓN -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start perspective-container">
+<!-- VISOR DE VIDEO & TOUR 3D INTERACTIVO -->
+<div class="lg:col-span-8 luxury-glass rounded-3xl p-5 border border-white/10 card-3d relative overflow-hidden" id="interactive-screen-card">
+<!-- Top Bar de la Consola de Producción -->
+<div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-white/10">
+<div class="flex items-center gap-3">
+<div class="flex gap-1.5">
+<span class="w-3 h-3 rounded-full bg-rose-500/80 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></span>
+<span class="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
+<span class="w-3 h-3 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+</div>
+<span class="font-mono text-xs text-on-surface-variant font-medium">penthouse_la_floresta_master_render.mp4</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-primary-glow font-mono text-[10px] font-bold">1080p yuv420p</span>
+</div>
+<!-- Modos: Video IA vs Malla 3D WebGL -->
+<div class="flex items-center p-1 rounded-xl bg-surface-base border border-white/10 font-mono text-xs">
+<button class="px-3 py-1 rounded-lg bg-primary text-surface-base font-bold shadow-md transition-all flex items-center gap-1.5" id="btn-mode-video" onclick="setScreenMode('video')">
+<span class="material-symbols-outlined text-[15px]">videocam</span> Video IA
+              </button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-white transition-all flex items-center gap-1.5" id="btn-mode-3d" onclick="setScreenMode('3d')">
+<span class="material-symbols-outlined text-[15px]">view_in_ar</span> Tour 3D WebGL
+              </button>
+</div>
+</div>
+<!-- Ventana de Visualización con Formato Dinámico (16:9 Cinema por defecto) -->
+<div class="relative rounded-2xl overflow-hidden bg-black/60 border border-white/10 shadow-2xl transition-all duration-500 flex items-center justify-center" id="media-stage">
+<!-- CAPA 1: VIDEO CINEMÁTICO REALISTA (CON IMAGEN DE ENTRADA PROPORCIONADA) -->
+<div class="w-full relative aspect-cinema transition-all duration-500 overflow-hidden flex items-center justify-center" id="video-frame">
+<img alt="{{DATA:IMAGE:IMAGE_4:ALT}}" class="w-full h-full object-cover transform scale-100 transition-transform duration-1000 ease-out hover:scale-105" id="main-view-image" src="https://lh3.googleusercontent.com/aida/AEtjO1XWYb4Drn8KHWCl6Bqwo8igAZy3SCCKv4crrJF0gV4CMqHpyIGHoUUvx_F3KuZoB8dU3UwM5gh-LqCnSCVIxB5JNkyolw-9KrK1BtCsTfSb3PIAGlFg2C6nLvO0BdS6g8So_bxHcAwa-QTAqsxzJYCctgwIx5unJsZ_Pn0NaRlRq31KSi4ktq_WIF8aof6tvII9XF6sza1nhKiPiS7jXY1B9nAtIhNgst1gI1Nc-zQ4jcGulx5XcghkYZa4"/>
+<!-- HUD CINEMÁTICO SUPERPUESTO -->
+<div class="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-base/80 backdrop-blur-md border border-cyan-glow/40 shadow-[0_0_15px_rgba(6,182,212,0.25)] font-mono text-xs text-cyan-light">
+<span class="w-2 h-2 rounded-full bg-cyan-light animate-ping"></span>
+<span>CÁMARA:</span>
+<strong class="text-white" id="hud-camera-text">Dolly In + Tilt Up (2.4s)</strong>
+</div>
+<div class="px-3 py-1 rounded-lg bg-surface-base/80 backdrop-blur-md border border-champagne/40 font-mono text-xs text-champagne-light">
+                  AUDIO: <strong class="text-white">90 BPM Procedural Lo-Fi Ducked</strong>
+</div>
+</div>
+<!-- PLAY OVERLAY FLOTANTE -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-base/95 via-transparent to-black/30 flex flex-col items-center justify-center transition-opacity duration-300" id="video-overlay">
+<button class="w-20 h-20 rounded-full bg-gradient-to-tr from-primary to-cyan-glow text-surface-base flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.7)] hover:scale-110 active:scale-95 transition-all" onclick="triggerPlaySimulation()">
+<span class="material-symbols-outlined text-4xl ml-1" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="mt-4 px-4 py-1.5 rounded-full bg-surface-raised/90 backdrop-blur-md border border-white/15 font-mono text-xs text-on-surface flex items-center gap-2 shadow-lg">
+<span class="w-2 h-2 rounded-full bg-primary-glow animate-pulse"></span>
+<span id="play-status-msg">Click para reproducir cinemática generada</span>
+</div>
+</div>
+<!-- BOTTOM HUD PROPIEDAD -->
+<div class="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+<div class="bg-surface-base/85 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
+<p class="font-bold text-sm text-white">Penthouse Sky Residence 88</p>
+<p class="text-[11px] text-on-surface-variant font-mono">Manhattan Skyline &amp; Midtown South · 3 Bed / 3.5 Bath</p>
+</div>
+<div class="bg-surface-base/85 backdrop-blur-md px-3.5 py-2 rounded-xl border border-primary/30 flex items-center gap-2 text-primary-glow font-mono text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+<span class="material-symbols-outlined text-sm">qr_code_2</span>
+<span>QR Auto-Linked</span>
+</div>
+</div>
+</div>
+<!-- CAPA 2: SIMULADOR 3D CON DEPTH ANYTHING V2 (MALLA VECTORIAL) -->
+<div class="w-full hidden relative aspect-cinema bg-[#060A10] overflow-hidden flex flex-col items-center justify-center p-8 text-center" id="tour-frame">
+<div class="absolute inset-0 cinema-mesh opacity-30"></div>
+<div class="relative z-10 w-72 h-72 rounded-3xl border border-cyan-glow/40 bg-surface-raised/70 backdrop-blur-md p-6 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.2)] card-3d">
+<span class="material-symbols-outlined text-cyan-light text-6xl mb-3 animate-pulse">view_in_ar</span>
+<span class="font-mono text-sm font-extrabold text-white tracking-wider">DEPTH ANYTHING V2</span>
+<span class="font-mono text-xs text-cyan-light mt-1">94MB ONNX Runtime WebGL</span>
+<div class="w-full bg-white/10 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-cyan-light h-full w-4/5 animate-pulse"></div>
+</div>
+<span class="font-mono text-[10px] text-on-surface-variant mt-2">Nube de puntos densa 360° calculada</span>
+</div>
+<p class="relative z-10 font-mono text-xs text-on-surface max-w-md mt-5">
+                Rotación orbital giroscópica monocular calculada sin sensores LiDAR adicionales. Arrastra para recorrer.
+              </p>
+<button class="relative z-10 mt-4 px-5 py-2 rounded-xl bg-cyan-glow/20 border border-cyan-glow text-cyan-light font-mono text-xs font-bold hover:bg-cyan-glow hover:text-surface-base transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]" onclick="alert('Iniciando exploración 3D con giroscopio activado...')">
+                Abrir Espacio 3D Inmersivo →
+              </button>
+</div>
+</div>
+<!-- Barra de Controles de Ratio & Movimiento -->
+<div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+<!-- Selector de Aspect Ratio -->
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs text-on-surface-variant uppercase font-medium">Relación de Aspecto:</span>
+<div class="flex items-center gap-1 bg-surface-base p-1 rounded-xl border border-white/10">
+<button class="px-3 py-1 rounded-lg bg-surface-elevated text-primary-glow border border-primary/30 font-mono text-xs font-bold transition-all" id="fmt-16-9" onclick="setRatio('16-9')">
+                  16:9 <span class="hidden sm:inline text-[10px] font-normal text-on-surface-variant">Cinema</span>
+</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-white font-mono text-xs transition-all" id="fmt-9-16" onclick="setRatio('9-16')">
+                  9:16 <span class="hidden sm:inline text-[10px] font-normal text-on-surface-variant">Reels/TikTok</span>
+</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-white font-mono text-xs transition-all" id="fmt-1-1" onclick="setRatio('1-1')">
+                  1:1 <span class="hidden sm:inline text-[10px] font-normal text-on-surface-variant">Feed</span>
+</button>
+</div>
+</div>
+<!-- Selector de Cinemática IA -->
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs text-on-surface-variant uppercase font-medium">Trayectoria de Cámara:</span>
+<select class="bg-surface-base border border-white/15 rounded-xl px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-primary" onchange="updateCameraPreset(this.value)">
+<option value="Dolly In + Tilt Up">Dolly In + Tilt Up (2.4s)</option>
+<option value="Orbit Pan Left to Right">Orbit Pan Left to Right (3.0s)</option>
+<option value="Slow Drone Elevation">Slow Drone Elevation (4.1s)</option>
+<option value="Architectural Push-Through">Architectural Push-Through (2.8s)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- PANEL LATERAL: SIMULADOR DE INGESTA DRAG & DROP Y ESTADO -->
+<div class="lg:col-span-4 space-y-4">
+<div class="luxury-glass rounded-3xl p-5 border border-white/10 specular-border card-3d" id="uploader-card">
+<div class="flex items-center justify-between mb-3">
+<span class="font-mono text-xs font-bold text-primary-glow uppercase tracking-wider">Simulador de Ingesta</span>
+<span class="px-2 py-0.5 rounded bg-surface-elevated font-mono text-[10px] text-on-surface-variant">HEIC, RAW, JPG</span>
+</div>
+<div class="border-2 border-dashed border-white/20 hover:border-primary/60 rounded-2xl p-6 bg-surface-base/50 cursor-pointer transition-all hover:bg-surface-raised/60 group text-center" onclick="executeSimulationRender()">
+<div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary-glow flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+<span class="material-symbols-outlined text-3xl">add_photo_alternate</span>
+</div>
+<h4 class="font-bold text-sm text-white">Arrastra las fotos de la propiedad</h4>
+<p class="text-xs text-on-surface-variant mt-1">Órbita detectará estancias, luz y ángulos automáticamente</p>
+<span class="inline-block mt-4 px-4 py-1.5 rounded-lg bg-white/5 border border-white/15 font-mono text-xs text-primary-glow group-hover:bg-primary group-hover:text-surface-base font-bold transition-all">
+                Simular Ingesta en Vivo
+              </span>
+</div>
+<!-- Progreso Reactivo -->
+<div class="mt-5 pt-4 border-t border-white/10 space-y-2.5">
+<div class="flex justify-between text-xs font-mono">
+<span class="text-white font-semibold" id="sim-status-label">Listo para sintetizar</span>
+<span class="text-primary-glow font-bold" id="sim-pct-label">100%</span>
+</div>
+<div class="w-full bg-surface-base h-2 rounded-full overflow-hidden border border-white/10 p-0.5">
+<div class="h-full bg-gradient-to-r from-primary via-primary-glow to-cyan-glow w-full rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" id="sim-bar"></div>
+</div>
+<div class="flex justify-between font-mono text-[9px] text-on-surface-variant uppercase">
+<span class="text-primary-glow">01 Ingest</span>
+<span class="text-cyan-light">04 CogVideoX</span>
+<span class="text-champagne-light">07 TTS Duck</span>
+<span class="text-white">10 Live CDN</span>
+</div>
+</div>
+</div>
+<!-- FICHA TÉCNICA DE SALIDA DEL MOTOR -->
+<div class="luxury-glass rounded-3xl p-5 border border-white/10 space-y-3 font-mono text-xs">
+<div class="flex items-center justify-between pb-2 border-b border-white/5">
+<span class="text-on-surface-variant">Generador Cinemático:</span>
+<span class="text-white font-bold">CogVideoX-3 I2V</span>
+</div>
+<div class="flex items-center justify-between pb-2 border-b border-white/5">
+<span class="text-on-surface-variant">Resolución Master:</span>
+<span class="text-cyan-light font-bold">1080p 30fps Master</span>
+</div>
+<div class="flex items-center justify-between pb-2 border-b border-white/5">
+<span class="text-on-surface-variant">Sintetizador Harmónico:</span>
+<span class="text-primary-glow font-bold">Procedural PCM (90 BPM)</span>
+</div>
+<div class="flex items-center justify-between pb-2 border-b border-white/5">
+<span class="text-on-surface-variant">Locución Bilingüe:</span>
+<span class="text-champagne font-bold">TTS Sidechain Comp</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-on-surface-variant">Tiempo de Render:</span>
+<span class="text-emerald-400 font-extrabold">&lt; 14.5 minutos</span>
+</div>
+</div>
+</div>
+</div>
+<!-- BANNER DE VALOR VIP: 4 PILARES -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+<div class="luxury-glass p-4 rounded-2xl border border-white/5 text-center">
+<p class="text-3xl font-extrabold font-mono text-primary-glow">5 min</p>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Fotos a Borrador</p>
+</div>
+<div class="luxury-glass p-4 rounded-2xl border border-white/5 text-center">
+<p class="text-3xl font-extrabold font-mono text-cyan-light">$0</p>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Cámaras 360 caras</p>
+</div>
+<div class="luxury-glass p-4 rounded-2xl border border-white/5 text-center">
+<p class="text-3xl font-extrabold font-mono text-white">ES / EN</p>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">Micrositio Bilingüe</p>
+</div>
+<div class="luxury-glass p-4 rounded-2xl border border-white/5 text-center">
+<p class="text-3xl font-extrabold font-mono text-champagne-light">100%</p>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mt-1">WhatsApp Lead Router</p>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+         TAB 2: 📊 INTELIGENCIA DE MERCADO USA (STACKED 3D CARDS)
+         ========================================================================= -->
+<section class="tab-pane space-y-8" id="tab-market">
+<!-- INTEL HEADER -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-4 border-b border-white/10">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-glow/10 border border-cyan-glow/30 font-mono text-xs text-cyan-light uppercase font-bold tracking-wider">
+            USA Hispanic Market Intelligence · Censo ACS 2024
+          </div>
+<h2 class="text-2xl sm:text-4xl font-extrabold text-white mt-2">
+            62 Millones de Hispanos · $2.4 Trillones en Poder de Compra
+          </h2>
+<p class="text-sm text-on-surface-variant mt-1 max-w-3xl">
+            Representan el 19% de la población de EE.UU. pero únicamente el 8% de los Realtors están certificados con fluidez bilingüe. Órbita conecta a los brokers con las 8 ciudades Tier 1 de máxima tracción.
+          </p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="w-10 h-10 rounded-xl bg-surface-raised border border-white/10 hover:border-primary text-white flex items-center justify-center transition-all" onclick="prevCityStack()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-mono text-xs text-on-surface-variant px-2" id="city-counter-label">Ciudad 1 de 8</span>
+<button class="w-10 h-10 rounded-xl bg-surface-raised border border-white/10 hover:border-primary text-white flex items-center justify-center transition-all" onclick="nextCityStack()">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- 4 CONTADORES MACRO -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="luxury-glass p-5 rounded-3xl border border-white/10 relative overflow-hidden">
+<span class="text-4xl font-black font-mono text-primary-glow">62.5M</span>
+<p class="text-sm font-bold text-white mt-1">Hispanos en Estados Unidos</p>
+<p class="text-[11px] font-mono text-on-surface-variant mt-0.5">Fuente: Censo de EE.UU. ACS 2024</p>
+</div>
+<div class="luxury-glass p-5 rounded-3xl border border-white/10 relative overflow-hidden">
+<span class="text-4xl font-black font-mono text-cyan-light">$2.4T</span>
+<p class="text-sm font-bold text-white mt-1">Poder de compra anual</p>
+<p class="text-[11px] font-mono text-on-surface-variant mt-0.5">Hispanic Wealth Project</p>
+</div>
+<div class="luxury-glass p-5 rounded-3xl border border-white/10 relative overflow-hidden">
+<span class="text-4xl font-black font-mono text-champagne-light">$482,000</span>
+<p class="text-sm font-bold text-white mt-1">Ticket medio comprador intl.</p>
+<p class="text-[11px] font-mono text-on-surface-variant mt-0.5">NAR Report (15% sobre media)</p>
+</div>
+<div class="luxury-glass p-5 rounded-3xl border border-white/10 relative overflow-hidden">
+<span class="text-4xl font-black font-mono text-emerald-400">18 MLS</span>
+<p class="text-sm font-bold text-white mt-1">Integración RESO Web API</p>
+<p class="text-[11px] font-mono text-on-surface-variant mt-0.5">MLS Grid con sync continuo</p>
+</div>
+</div>
+<!-- SISTEMA DE TARJETAS APILABLES 3D (INTERACTIVE 3D PERSPECTIVE STACK) -->
+<div class="perspective-container py-4 relative min-h-[380px] flex items-center justify-center" id="cities-stack-container">
+<!-- CARD 1: Miami -->
+<div class="stack-card active luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl z-30" data-index="0" style="transform: translateY(0px) scale(1) translateZ(0px);">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-primary/20 text-primary-glow font-mono text-xs font-bold uppercase">Florida · Tier 1 Primario</span>
+<span class="font-mono text-xs text-on-surface-variant">Stellar MLS · MIAMI RE</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Miami (FL) — 55% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">
+            El nodo #1 indiscutible para capitales de LATAM (Argentina, Colombia, México, Venezuela). Régimen fiscal sin impuesto estatal sobre la renta (0% State Income Tax), convirtiéndola en el paraíso de inversión residencial.
+          </p>
+<div class="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-white/10 font-mono text-xs">
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">State Tax:</span><span class="text-emerald-400 font-bold">0.0%</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">Property Tax:</span><span class="text-white font-bold">~0.83%</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">Segmento:</span><span class="text-cyan-light font-bold">Cash Buyers</span></div>
+</div>
+</div>
+<!-- CARD 2: Houston -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl z-20" data-index="1" style="transform: translateY(18px) scale(0.96) translateZ(-40px); opacity: 0.85;">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-primary/20 text-primary-glow font-mono text-xs font-bold uppercase">Texas · Tier 1 Primario</span>
+<span class="font-mono text-xs text-on-surface-variant">HAR MLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Houston (TX) — 45% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">
+            La mayor comunidad latina en Texas con más de 2.5 millones de hispanohablantes. Mercado caracterizado por créditos hipotecarios ITIN, relocalización industrial y compras de primera vivienda.
+          </p>
+<div class="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-white/10 font-mono text-xs">
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">State Tax:</span><span class="text-emerald-400 font-bold">0.0%</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">Property Tax:</span><span class="text-white font-bold">~1.81%</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">MLS Core:</span><span class="text-cyan-light font-bold">HAR.com</span></div>
+</div>
+</div>
+<!-- CARD 3: Los Angeles -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl z-10" data-index="2" style="transform: translateY(36px) scale(0.92) translateZ(-80px); opacity: 0.6;">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-cyan-glow/20 text-cyan-light font-mono text-xs font-bold uppercase">California · Tier 1 Primario</span>
+<span class="font-mono text-xs text-on-surface-variant">CRMLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Los Angeles (CA) — 49% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">
+            La mayor concentración hispana de Estados Unidos (5.98M en el condado). Máxima efectividad de campañas en Reels 9:16 y tours virtuales 3D para compradores de segunda y tercera generación.
+          </p>
+<div class="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-white/10 font-mono text-xs">
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">State Tax:</span><span class="text-rose-400 font-bold">Hasta 13.3%</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">Property Tax:</span><span class="text-white font-bold">0.71% (Prop 13)</span></div>
+<div class="bg-surface-base/80 p-3 rounded-xl"><span class="text-on-surface-variant block">MLS Core:</span><span class="text-cyan-light font-bold">CRMLS</span></div>
+</div>
+</div>
+<!-- CARD 4: Dallas-Fort Worth -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl hidden" data-index="3">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-primary/20 text-primary-glow font-mono text-xs font-bold uppercase">Texas · Tier 1</span>
+<span class="font-mono text-xs text-on-surface-variant">NTREIS MLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Dallas-Fort Worth (TX) — 29% Latino</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Crecimiento explosivo de relocalizaciones familiares de California e Illinois. Expansión de suburbios residenciales e inversionistas unifamiliares.</p>
+</div>
+<!-- CARD 5: San Antonio -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl hidden" data-index="4">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-primary/20 text-primary-glow font-mono text-xs font-bold uppercase">Texas · Tier 1</span>
+<span class="font-mono text-xs text-on-surface-variant">SABOR MLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">San Antonio (TX) — 64% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Mayor proporción hispana entre las 10 grandes metrópolis de EE.UU. Mercado con fuerte lealtad hacia agentes bilingües que ofrecen contratos claros en español.</p>
+</div>
+<!-- CARD 6: San Diego -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl hidden" data-index="5">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-cyan-glow/20 text-cyan-light font-mono text-xs font-bold uppercase">California · Tier 1</span>
+<span class="font-mono text-xs text-on-surface-variant">CRMLS / Sandicor</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">San Diego (CA) — 34% Latino Binacional</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Corredor binacional Tijuana-San Diego. Altísima tasa de compradores transfronterizos que compran propiedades residenciales mediante recorridos remotos 3D.</p>
+</div>
+<!-- CARD 7: Phoenix -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl hidden" data-index="6">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-champagne/20 text-champagne font-mono text-xs font-bold uppercase">Arizona · Tier 1</span>
+<span class="font-mono text-xs text-on-surface-variant">ARMLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Phoenix (AZ) — 41% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Hub primordial de jubilación y segunda residencia. Fuerte interacción con familias e inversores provenientes de Sonora y estados fronterizos.</p>
+</div>
+<!-- CARD 8: Las Vegas -->
+<div class="stack-card luxury-glass rounded-3xl p-6 sm:p-8 border border-white/15 w-full max-w-2xl absolute transition-all duration-500 shadow-2xl hidden" data-index="7">
+<div class="flex items-center justify-between mb-3">
+<span class="px-3 py-1 rounded-full bg-champagne/20 text-champagne font-mono text-xs font-bold uppercase">Nevada · Tier 1</span>
+<span class="font-mono text-xs text-on-surface-variant">GLVAR MLS</span>
+</div>
+<h3 class="text-3xl font-extrabold text-white">Las Vegas (NV) — 33% Población Latina</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Foco de alquiler temporal (STR) y casas vacacionales de inversión. Beneficio radical: cero impuesto estatal a las ganancias.</p>
+</div>
+</div>
+<!-- GRILLA COMPLETA DE CIUDADES EN MINIATURA -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(0)">
+<p class="font-mono text-[10px] text-primary-glow font-bold">FL · 55%</p>
+<p class="font-bold text-xs text-white">Miami</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(1)">
+<p class="font-mono text-[10px] text-primary-glow font-bold">TX · 45%</p>
+<p class="font-bold text-xs text-white">Houston</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(2)">
+<p class="font-mono text-[10px] text-cyan-light font-bold">CA · 49%</p>
+<p class="font-bold text-xs text-white">Los Angeles</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(3)">
+<p class="font-mono text-[10px] text-primary-glow font-bold">TX · 29%</p>
+<p class="font-bold text-xs text-white">Dallas-FW</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(4)">
+<p class="font-mono text-[10px] text-primary-glow font-bold">TX · 64%</p>
+<p class="font-bold text-xs text-white">San Antonio</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(5)">
+<p class="font-mono text-[10px] text-cyan-light font-bold">CA · 34%</p>
+<p class="font-bold text-xs text-white">San Diego</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(6)">
+<p class="font-mono text-[10px] text-champagne-light font-bold">AZ · 41%</p>
+<p class="font-bold text-xs text-white">Phoenix</p>
+</button>
+<button class="p-3 rounded-2xl bg-surface-raised border border-white/10 hover:border-primary text-left transition-all" onclick="setCityByIndex(7)">
+<p class="font-mono text-[10px] text-champagne-light font-bold">NV · 33%</p>
+<p class="font-bold text-xs text-white">Las Vegas</p>
+</button>
+</div>
+</section>
+<!-- =========================================================================
+         TAB 3: ⚖️ ARQUITECTURA LEGAL & COMPLIANCE US
+         ========================================================================= -->
+<section class="tab-pane space-y-8" id="tab-legal">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-champagne/15 border border-champagne/30 font-mono text-xs text-champagne font-bold tracking-wider uppercase">
+            Federal Compliance &amp; Foreign Investor Framework
+          </div>
+<h2 class="text-2xl sm:text-4xl font-extrabold text-white mt-2">
+            Cumplimiento Normativo FHA, RESPA, TRID y NAR
+          </h2>
+<p class="text-sm text-on-surface-variant mt-1 max-w-2xl">
+            Órbita inyecta filtros algorítmicos en el contenido generado para neutralizar riesgos legales y blindar a los brokers ante penalizaciones de la CFPB y HUD.
+          </p>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-surface-raised border border-emerald-500/30 text-primary-glow font-mono text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+<span class="w-2 h-2 rounded-full bg-primary-glow animate-ping"></span>
+          Auditoría de IA Activa
+        </div>
+</div>
+<!-- MATRIZ 4 CUADRANTES DE LEYES FEDERALES -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- FHA -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 specular-border card-3d">
+<div class="flex items-center justify-between mb-4">
+<span class="px-3 py-1 rounded-lg bg-champagne/20 text-champagne font-mono text-xs font-bold">FHA (Fair Housing Act)</span>
+<span class="material-symbols-outlined text-primary-glow">verified_user</span>
+</div>
+<h3 class="text-lg font-bold text-white mb-2">Prohibición Estricta de Sesgos Demográficos</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+            El motor de guion GLM-4.5v audita automáticamente cada descripción eliminando términos discriminatorios como "barrio latino", "cerca de iglesias católicas" o "ideal para familias jóvenes", sustituyéndolos por características arquitectónicas tangibles conformes a las pautas de HUD.
+          </p>
+<div class="p-3 rounded-xl bg-surface-base/80 border border-white/5 font-mono text-[11px] text-on-surface">
+            ✓ Logotipo Equal Housing Opportunity inyectado en video 1080p y micrositio SSR.
+          </div>
+</div>
+<!-- RESPA -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 specular-border card-3d">
+<div class="flex items-center justify-between mb-4">
+<span class="px-3 py-1 rounded-lg bg-champagne/20 text-champagne font-mono text-xs font-bold">RESPA (Section 8)</span>
+<span class="material-symbols-outlined text-primary-glow">verified_user</span>
+</div>
+<h3 class="text-lg font-bold text-white mb-2">Transparencia y Cero Comisiones Clandestinas</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+            Regula la relación entre agentes, prestamistas hipotecarios bilingües y compañías de títulos. Prohíbe pagos por referencias ilícitas ("kickbacks"). Todo acuerdo de co-marketing en el micrositio debe reflejar el valor razonable de mercado (FMV).
+          </p>
+<div class="p-3 rounded-xl bg-surface-base/80 border border-white/5 font-mono text-[11px] text-on-surface">
+            ✓ Co-branding transparente 50/50 con disclaimers obligatorios para prestamistas.
+          </div>
+</div>
+<!-- TRID -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 specular-border card-3d">
+<div class="flex items-center justify-between mb-4">
+<span class="px-3 py-1 rounded-lg bg-champagne/20 text-champagne font-mono text-xs font-bold">TRID &amp; CFPB Disclosures</span>
+<span class="material-symbols-outlined text-primary-glow">verified_user</span>
+</div>
+<h3 class="text-lg font-bold text-white mb-2">Simuladores Hipotecarios No Vinculantes</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+            Cualquier cálculo de cuota mensual o interés estimado en el micrositio incorpora advertencias legales bilingües no vinculantes, requiriendo que el comprador solicite el Formulario de Estimación de Préstamo (Loan Estimate) oficial.
+          </p>
+<div class="p-3 rounded-xl bg-surface-base/80 border border-white/5 font-mono text-[11px] text-on-surface">
+            ✓ Leyenda legal: "Cálculo puramente ilustrativo sujeto a suscripción crediticia".
+          </div>
+</div>
+<!-- NAR / MLS -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 specular-border card-3d">
+<div class="flex items-center justify-between mb-4">
+<span class="px-3 py-1 rounded-lg bg-champagne/20 text-champagne font-mono text-xs font-bold">NAR &amp; MLS Grid Web API</span>
+<span class="material-symbols-outlined text-primary-glow">verified_user</span>
+</div>
+<h3 class="text-lg font-bold text-white mb-2">Atribución y Cumplimiento RESO</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+            Conexión autorizada vía RESO Web API con MLS Grid. Cada video y micrositio despliega el logotipo del broker listador, identificación de la agencia, número de MLS y estado de la propiedad con actualización periódica de estatus.
+          </p>
+<div class="p-3 rounded-xl bg-surface-base/80 border border-white/5 font-mono text-[11px] text-on-surface">
+            ✓ Atribución mandatada visible en los créditos finales del master 1080p.
+          </div>
+</div>
+</div>
+<!-- SECCIÓN ESPECIAL: INSTRUMENTOS PARA COMPRADORES EXTRANJEROS -->
+<div class="luxury-glass p-6 sm:p-8 rounded-3xl border border-white/10">
+<h3 class="text-xl font-bold text-white flex items-center gap-2.5 mb-2">
+<span class="material-symbols-outlined text-cyan-light">account_balance</span>
+          Programas de Financiación para Compradores Internacionales &amp; LATAM
+        </h3>
+<p class="text-xs text-on-surface-variant mb-6">Herramientas incorporadas en el micrositio para asesorar al inversor no residente:</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 font-mono text-xs">
+<div class="p-4 rounded-2xl bg-surface-base border border-white/5">
+<span class="text-primary-glow font-bold block mb-1">Préstamos ITIN</span>
+<p class="text-[11px] text-on-surface-variant">Financiación para compradores con Número de Identificación Tributaria sin requerir SSN.</p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-base border border-white/5">
+<span class="text-cyan-light font-bold block mb-1">Hipotecas Non-QM</span>
+<p class="text-[11px] text-on-surface-variant">Préstamos no calificados respaldados por extractos bancarios de 12 a 24 meses.</p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-base border border-white/5">
+<span class="text-champagne-light font-bold block mb-1">Créditos DSCR</span>
+<p class="text-[11px] text-on-surface-variant">Calificación basada en el flujo de caja del alquiler de la propiedad, no ingresos personales.</p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-base border border-white/5">
+<span class="text-emerald-400 font-bold block mb-1">1031 Exchange</span>
+<p class="text-[11px] text-on-surface-variant">Diferimiento del impuesto sobre ganancias de capital al reinvertir en otra propiedad similar.</p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-base border border-white/5">
+<span class="text-rose-400 font-bold block mb-1">Retención FIRPTA 15%</span>
+<p class="text-[11px] text-on-surface-variant">Retención obligatoria en la venta por personas extranjeras con exenciones planificadas.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+         TAB 4: ⚡ PIPELINE 15 MIN & AI AGENT HUB (MCP & OPENAPI)
+         ========================================================================= -->
+<section class="tab-pane space-y-8" id="tab-pipeline">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 border border-primary/30 font-mono text-xs text-primary-glow font-bold tracking-wider uppercase">
+            10 Fases Autónomas · Totalmente Determinista
+          </div>
+<h2 class="text-2xl sm:text-4xl font-extrabold text-white mt-2">
+            Pipeline Orquestado en Menos de 15 Minutos
+          </h2>
+<p class="text-sm text-on-surface-variant mt-1">
+            Cada fase cuenta con hash determinista SHA-256 y soporte reanudable. Inspecciona cada etapa y conéctala con Cursor, Claude o n8n.
+          </p>
+</div>
+<div class="font-mono text-xs text-cyan-light bg-surface-raised px-4 py-2 rounded-xl border border-white/10">
+          MCP Server &amp; OpenAPI 3.1 Spec Ready
+        </div>
+</div>
+<!-- STEPPER INTERACTIVO DE LAS 10 FASES -->
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="pipeline-stepper">
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-elevated border border-primary text-left transition-all" id="phase-btn-1" onclick="setPipePhase(1)">
+<span class="font-mono text-[10px] text-primary-glow font-bold block">01 INGEST</span>
+<span class="text-xs font-bold text-white">Ingesta Fotos</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">1-2s · sha256</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-2" onclick="setPipePhase(2)">
+<span class="font-mono text-[10px] text-cyan-light font-bold block">02 ANALYZE</span>
+<span class="text-xs font-bold text-white">GLM-4.5v Vision</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">15 estancias</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-3" onclick="setPipePhase(3)">
+<span class="font-mono text-[10px] text-primary-glow font-bold block">03 DIRECT</span>
+<span class="text-xs font-bold text-white">Director IA</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">11 movimientos</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-4" onclick="setPipePhase(4)">
+<span class="font-mono text-[10px] text-cyan-light font-bold block">04 RENDER</span>
+<span class="text-xs font-bold text-white">CogVideoX-3</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">GPU Cluster</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-5" onclick="setPipePhase(5)">
+<span class="font-mono text-[10px] text-champagne-light font-bold block">05 MONTAGE</span>
+<span class="text-xs font-bold text-white">ffmpeg Xfade</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">0.55s blend</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-6" onclick="setPipePhase(6)">
+<span class="font-mono text-[10px] text-champagne-light font-bold block">06 MUSIC</span>
+<span class="text-xs font-bold text-white">Audio PCM</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">Sin licencias</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-7" onclick="setPipePhase(7)">
+<span class="font-mono text-[10px] text-primary-glow font-bold block">07 VOICEOVER</span>
+<span class="text-xs font-bold text-white">TTS Neural</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">Sidechain Duck</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-8" onclick="setPipePhase(8)">
+<span class="font-mono text-[10px] text-cyan-light font-bold block">08 3D TOUR</span>
+<span class="text-xs font-bold text-white">Depth V2</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">ONNX WebGL</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-9" onclick="setPipePhase(9)">
+<span class="font-mono text-[10px] text-primary-glow font-bold block">09 MICROSITE</span>
+<span class="text-xs font-bold text-white">SSR + QR</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">WhatsApp Lead</span>
+</button>
+<button class="phase-btn p-3.5 rounded-2xl bg-surface-raised border border-white/10 hover:border-white/25 text-left transition-all" id="phase-btn-10" onclick="setPipePhase(10)">
+<span class="font-mono text-[10px] text-cyan-light font-bold block">10 TELEMETRY</span>
+<span class="text-xs font-bold text-white">Analíticas 14d</span>
+<span class="text-[10px] font-mono text-on-surface-variant block mt-0.5">Conversión</span>
+</button>
+</div>
+<!-- DETALLE EXPANSIVO DE LA FASE SELECCIONADA -->
+<div class="luxury-glass rounded-3xl p-6 border border-primary/30 relative" id="pipe-card-detail">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 rounded-lg bg-primary/20 text-primary-glow font-mono text-xs font-bold" id="pipe-detail-badge">FASE 01 · INGEST</span>
+<h3 class="text-xl font-bold text-white" id="pipe-detail-title">Ingesta Masiva y Normalización</h3>
+</div>
+<span class="font-mono text-xs text-primary-fixed bg-surface-base px-3 py-1 rounded-lg border border-white/10" id="pipe-detail-latency">Latencia media: 1-2s</span>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed" id="pipe-detail-desc">
+          Recepción mediante Drag-and-drop, ZIP de alta resolución o URL de MLS. Detección automática de duplicados mediante hash SHA-256 determinista. Generación instantánea de miniaturas ligeras a 640px para previsualización inmediata. Corrección de orientación EXIF y calibración de rango dinámico.
+        </p>
+</div>
+<!-- CONSOLA DE DESARROLLADOR: MCP SERVER / OPENAPI 3.1 -->
+<div class="luxury-glass rounded-3xl border border-white/15 overflow-hidden shadow-2xl">
+<div class="bg-surface-raised px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
+<div class="flex items-center gap-3 font-mono text-xs">
+<div class="flex gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+</div>
+<span class="text-white font-bold">Órbita MCP Tooling &amp; Real-Time Integration</span>
+</div>
+<!-- Selector de Modo de Código -->
+<div class="flex items-center bg-surface-base p-1 rounded-xl border border-white/10 font-mono text-xs">
+<button class="px-3 py-1 rounded-lg bg-surface-elevated text-primary-glow font-bold" id="code-btn-mcp" onclick="switchSnippet('mcp')">MCP Server</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-white" id="code-btn-openapi" onclick="switchSnippet('openapi')">OpenAPI 3.1</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-white" id="code-btn-webhook" onclick="switchSnippet('webhook')">WhatsApp Webhook</button>
+</div>
+</div>
+<div class="p-6 font-mono text-xs sm:text-sm bg-[#040609] text-on-surface overflow-x-auto relative">
+<button class="absolute top-4 right-4 px-3 py-1.5 rounded-xl bg-surface-raised hover:bg-surface-elevated border border-white/15 text-xs text-white flex items-center gap-1.5 transition-all" onclick="copyCode()">
+<span class="material-symbols-outlined text-[16px] text-primary-glow">content_copy</span>
+<span id="copy-status-text">Copiar</span>
+</button>
+<pre class="leading-relaxed text-slate-300" id="code-canvas"><span class="text-slate-500"># Herramienta MCP ejecutable desde Claude Desktop, Cursor o Cline</span>
+<span class="text-primary-glow">curl</span> -X POST https://orbita.alicelabs.site/api/mcp \
+  -H <span class="text-cyan-light">"Content-Type: application/json"</span> \
+  -H <span class="text-cyan-light">"Authorization: Bearer orb_sec_live_992a8e1"</span> \
+  -d <span class="text-champagne-light">'{
+    "jsonrpc": "2.0",
+    "id": "req_orbita_pack",
+    "method": "tools/call",
+    "params": {
+      "name": "generate_property_pack",
+      "arguments": {
+        "property_id": "sky_residence_88",
+        "aspect_ratio": "16:9",
+        "mls_id": "stellar_fl",
+        "compliance_mode": "fha_respa_strict",
+        "audio_style": "ambient_lofi_90bpm"
+      }
+    }
+  }'</span></pre>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+         TAB 5: 💎 PLANES & PRECIOS (VIP TIERS)
+         ========================================================================= -->
+<section class="tab-pane space-y-8" id="tab-pricing">
+<div class="text-center max-w-2xl mx-auto space-y-3">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-champagne/15 border border-champagne/30 font-mono text-xs text-champagne font-bold tracking-wider uppercase">
+          Economía Transparente · Sin Contratos Forzados
+        </div>
+<h2 class="text-3xl sm:text-5xl font-extrabold text-white">
+          Inversión Justa y de Retorno Inmediato
+        </h2>
+<p class="text-sm text-on-surface-variant">
+          Paga únicamente por la propiedad procesada o escala con volumen mensual para tu agencia inmobiliaria.
+        </p>
+<!-- Toggle Mensual vs Pago Único -->
+<div class="mt-4 inline-flex items-center gap-2 p-1 rounded-2xl bg-surface-raised border border-white/10 font-mono text-xs">
+<button class="px-4 py-1.5 rounded-xl bg-primary text-surface-base font-bold shadow-md" id="price-toggle-single" onclick="setPricingMode('single')">
+            Pago Por Propiedad
+          </button>
+<button class="px-4 py-1.5 rounded-xl text-on-surface-variant hover:text-white" id="price-toggle-agency" onclick="setPricingMode('agency')">
+            Suscripción Agencia (Mensual)
+          </button>
+</div>
+</div>
+<!-- 4 TARJETAS DE PRECIOS CON PROFUNDIDAD Y RESPLANDOR -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 perspective-container">
+<!-- STARTER -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 flex flex-col justify-between card-3d">
+<div>
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-lg text-white">Starter</h4>
+<span class="text-[10px] font-mono text-on-surface-variant uppercase bg-surface-elevated px-2 py-0.5 rounded">Casual</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-6">Para agentes individuales con listados ocasionales.</p>
+<div class="mb-6">
+<span class="text-4xl font-extrabold font-mono text-white">$19</span>
+<span class="text-xs font-mono text-on-surface-variant">/ propiedad</span>
+</div>
+<ul class="space-y-2.5 text-xs text-on-surface-variant font-medium mb-6">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> 1 propiedad completa</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Formatos 16:9 + 9:16 + 1:1</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Tour 3D interactivo WebGL</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Micrositio SSR bilingüe ES/EN</li>
+</ul>
+</div>
+<button class="w-full py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-white font-mono text-xs font-bold border border-white/15 transition-all" onclick="alert('Iniciando orden Starter: $19 por propiedad')">
+            Elegir Starter
+          </button>
+</div>
+<!-- PRO STUDIO (DESTACADO CON GLOW ESMERALDA) -->
+<div class="luxury-glass p-6 rounded-3xl border-2 border-primary bg-primary/[0.04] shadow-[0_0_40px_rgba(16,185,129,0.25)] flex flex-col justify-between relative transform lg:-translate-y-2 card-3d">
+<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-gradient-to-r from-primary to-primary-glow text-surface-base font-mono text-[11px] font-extrabold uppercase tracking-wider shadow-lg">
+            Recomendado · Top Ventas
+          </div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-lg text-white">Pro Studio</h4>
+<span class="text-[10px] font-mono text-primary-glow uppercase bg-primary/20 px-2 py-0.5 rounded font-bold">Elite</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-6">Para brokers bilingües de alto rendimiento en USA.</p>
+<div class="mb-6">
+<span class="text-4xl font-extrabold font-mono text-primary-glow">$49</span>
+<span class="text-xs font-mono text-on-surface-variant">/ propiedad</span>
+</div>
+<ul class="space-y-2.5 text-xs text-on-surface font-medium mb-6">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Todo lo de Starter</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Locución TTS con 4 voces neurales</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Música procedural libre de derechos</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Lead router directo a WhatsApp</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-primary-glow text-base">check</span> Telemetría de visitas por 60 días</li>
+</ul>
+</div>
+<button class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-primary-glow text-surface-base font-mono text-xs font-extrabold shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:shadow-[0_0_35px_rgba(16,185,129,0.7)] transition-all" onclick="alert('Iniciando orden Pro Studio: $49 por propiedad')">
+            Adquirir Pro Studio
+          </button>
+</div>
+<!-- AGENCY -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 flex flex-col justify-between card-3d">
+<div>
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-lg text-white">Agency</h4>
+<span class="text-[10px] font-mono text-cyan-light uppercase bg-cyan-glow/20 px-2 py-0.5 rounded font-bold">Escala</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-6">Para agencias y equipos inmobiliarios en crecimiento.</p>
+<div class="mb-6">
+<span class="text-4xl font-extrabold font-mono text-cyan-light">$199</span>
+<span class="text-xs font-mono text-on-surface-variant">/ mes</span>
+</div>
+<ul class="space-y-2.5 text-xs text-on-surface-variant font-medium mb-6">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-cyan-light text-base">check</span> 20 propiedades incluidas por mes</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-cyan-light text-base">check</span> Marca blanca total con tu dominio</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-cyan-light text-base">check</span> Acceso completo a MCP &amp; API OpenAPI</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-cyan-light text-base">check</span> Soporte prioritario 24/7</li>
+</ul>
+</div>
+<button class="w-full py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-white font-mono text-xs font-bold border border-white/15 transition-all" onclick="alert('Iniciando suscripción Agency: $199/mes')">
+            Activar Plan Agency
+          </button>
+</div>
+<!-- ENTERPRISE -->
+<div class="luxury-glass p-6 rounded-3xl border border-white/10 flex flex-col justify-between card-3d">
+<div>
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-lg text-white">Enterprise</h4>
+<span class="text-[10px] font-mono text-champagne-light uppercase bg-champagne/20 px-2 py-0.5 rounded font-bold">Custom</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-6">Franquicias MLS y redes multinacionales.</p>
+<div class="mb-6">
+<span class="text-4xl font-extrabold font-mono text-champagne-light">A Medida</span>
+<span class="text-xs font-mono text-on-surface-variant">/ volumen</span>
+</div>
+<ul class="space-y-2.5 text-xs text-on-surface-variant font-medium mb-6">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-champagne-light text-base">check</span> Propiedades ilimitadas</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-champagne-light text-base">check</span> Integración directa en tu CRM / ERP</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-champagne-light text-base">check</span> SLA 99.99% garantizado</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-champagne-light text-base">check</span> Cluster GPU dedicado on-premise</li>
+</ul>
+</div>
+<a class="w-full py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-bright text-white font-mono text-xs font-bold border border-white/15 text-center block transition-all" href="mailto:hello@alicelabs.site">
+            Contactar Ventas VIP
+          </a>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER DE ULTRA LUJO CINEMÁTICO -->
+<footer class="w-full border-t border-white/10 bg-[#040609] py-10 mt-16 relative z-10 text-on-surface-variant font-mono text-xs">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
+<div class="flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-glow shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+<span class="text-white font-bold">Órbita Property Engine</span>
+<span class="text-on-surface-variant">· Operado por AliceLabs LLC · Sheridan, Wyoming, USA</span>
+</div>
+<div class="flex items-center gap-5">
+<button class="hover:text-primary-glow transition-colors" onclick="switchTab('tab-pipeline')">MCP Tooling</button>
+<button class="hover:text-champagne transition-colors" onclick="switchTab('tab-legal')">Compliance FHA/RESPA</button>
+<a class="hover:text-cyan-light transition-colors" href="mailto:hello@alicelabs.site">hello@alicelabs.site</a>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
+<p>Equal Housing Opportunity. Conforme a las directrices de la Fair Housing Act, RESPA Section 8 y TRID CFPB.</p>
+<p>© 2026 AliceLabs LLC. Todos los derechos reservados.</p>
+</div>
+</div>
+</footer>
+<!-- =========================================================================
+       VANILLA JAVASCRIPT: CONTROL DE TABS, FORMATOS, 3D TILT Y STACK
+       ========================================================================= -->
+<script>
+    // 1. SISTEMA PRINCIPAL DE CAMBIO DE PESTAÑAS CINEMÁTICAS
+    function switchTab(tabId) {
+      const panes = document.querySelectorAll('.tab-pane');
+      panes.forEach(pane => pane.classList.remove('active'));
+
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+
+      // Actualizar botones de navegación desktop
+      const navButtons = document.querySelectorAll('#nav-tabs .nav-tab-btn');
+      navButtons.forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-surface-base', 'shadow-[0_0_20px_rgba(16,185,129,0.45)]', 'font-semibold');
+        btn.classList.add('text-on-surface-variant', 'font-medium');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-on-surface-variant', 'font-medium');
+        activeBtn.classList.add('bg-primary', 'text-surface-base', 'shadow-[0_0_20px_rgba(16,185,129,0.45)]', 'font-semibold');
+      }
+
+      // Actualizar botones en móviles
+      const mButtons = document.querySelectorAll('header .no-scrollbar button');
+      mButtons.forEach(b => {
+        b.classList.remove('bg-primary', 'text-surface-base', 'font-bold');
+        b.classList.add('bg-surface-elevated', 'text-on-surface-variant');
+      });
+      const activeMobile = document.getElementById('m-' + tabId.replace('tab-', 'tab-'));
+      if (activeMobile) {
+        activeMobile.classList.remove('bg-surface-elevated', 'text-on-surface-variant');
+        activeMobile.classList.add('bg-primary', 'text-surface-base', 'font-bold');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 2. SWITCH DE FORMATO (16:9 Cinema, 9:16 Reels, 1:1 Feed)
+    function setRatio(ratio) {
+      const frame = document.getElementById('video-frame');
+      const btn169 = document.getElementById('fmt-16-9');
+      const btn916 = document.getElementById('fmt-9-16');
+      const btn11 = document.getElementById('fmt-1-1');
+
+      frame.classList.remove('aspect-cinema', 'aspect-reel', 'aspect-square');
+      [btn169, btn916, btn11].forEach(b => {
+        b.classList.remove('bg-surface-elevated', 'text-primary-glow', 'border', 'border-primary/30', 'font-bold');
+        b.classList.add('text-on-surface-variant');
+      });
+
+      if (ratio === '16-9') {
+        frame.classList.add('aspect-cinema');
+        btn169.classList.add('bg-surface-elevated', 'text-primary-glow', 'border', 'border-primary/30', 'font-bold');
+      } else if (ratio === '9-16') {
+        frame.classList.add('aspect-reel');
+        btn916.classList.add('bg-surface-elevated', 'text-primary-glow', 'border', 'border-primary/30', 'font-bold');
+      } else if (ratio === '1-1') {
+        frame.classList.add('aspect-square');
+        btn11.classList.add('bg-surface-elevated', 'text-primary-glow', 'border', 'border-primary/30', 'font-bold');
+      }
+    }
+
+    // 3. CAMBIO DE MODO: VIDEO IA VS TOUR 3D WEBGL
+    function setScreenMode(mode) {
+      const vFrame = document.getElementById('video-frame');
+      const tFrame = document.getElementById('tour-frame');
+      const bVideo = document.getElementById('btn-mode-video');
+      const b3D = document.getElementById('btn-mode-3d');
+
+      if (mode === 'video') {
+        vFrame.classList.remove('hidden');
+        tFrame.classList.add('hidden');
+        bVideo.classList.add('bg-primary', 'text-surface-base', 'font-bold');
+        bVideo.classList.remove('text-on-surface-variant');
+        b3D.classList.remove('bg-primary', 'text-surface-base', 'font-bold');
+        b3D.classList.add('text-on-surface-variant');
+      } else {
+        vFrame.classList.add('hidden');
+        tFrame.classList.remove('hidden');
+        b3D.classList.add('bg-primary', 'text-surface-base', 'font-bold');
+        b3D.classList.remove('text-on-surface-variant');
+        bVideo.classList.remove('bg-primary', 'text-surface-base', 'font-bold');
+        bVideo.classList.add('text-on-surface-variant');
+      }
+    }
+
+    // 4. REPRODUCCIÓN SIMULADA Y PRESET DE CÁMARA
+    let playState = false;
+    function triggerPlaySimulation() {
+      const overlay = document.getElementById('video-overlay');
+      const msg = document.getElementById('play-status-msg');
+      playState = !playState;
+
+      if (playState) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          playState = false;
+          msg.innerText = "Secuencia completada · Click para repetir";
+        }, 5500);
+      }
+    }
+
+    function updateCameraPreset(val) {
+      document.getElementById('hud-camera-text').innerText = val;
+    }
+
+    // 5. SIMULADOR DE INGESTA REACTIVO
+    function executeSimulationRender() {
+      const bar = document.getElementById('sim-bar');
+      const lbl = document.getElementById('sim-status-label');
+      const pct = document.getElementById('sim-pct-label');
+
+      lbl.innerText = "Normalizando fotos y extrayendo EXIF...";
+      bar.style.width = "25%";
+      pct.innerText = "25%";
+
+      setTimeout(() => {
+        lbl.innerText = "Análisis de estancias GLM-4.5v...";
+        bar.style.width = "50%";
+        pct.innerText = "50%";
+      }, 700);
+
+      setTimeout(() => {
+        lbl.innerText = "CogVideoX-3 sintetizando movimiento...";
+        bar.style.width = "85%";
+        pct.innerText = "85%";
+      }, 1500);
+
+      setTimeout(() => {
+        lbl.innerText = "¡Master completado y enrutado a CDN!";
+        bar.style.width = "100%";
+        pct.innerText = "100%";
+      }, 2300);
+    }
+
+    // 6. STACK DE TARJETAS 3D PARA CIUDADES DE MERCADO
+    let currentCityIndex = 0;
+    const totalCities = 8;
+
+    function renderCityStack() {
+      const cards = document.querySelectorAll('.stack-card');
+      cards.forEach((card, idx) => {
+        card.classList.add('hidden');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px) scale(0.9) translateZ(-100px)';
+      });
+
+      // Posicionar tarjeta activa (delante)
+      const activeCard = cards[currentCityIndex];
+      if (activeCard) {
+        activeCard.classList.remove('hidden');
+        activeCard.style.opacity = '1';
+        activeCard.style.zIndex = '30';
+        activeCard.style.transform = 'translateY(0px) scale(1) translateZ(0px)';
+      }
+
+      // Posicionar tarjeta trasera 1
+      const next1 = (currentCityIndex + 1) % totalCities;
+      const cardNext1 = cards[next1];
+      if (cardNext1) {
+        cardNext1.classList.remove('hidden');
+        cardNext1.style.opacity = '0.85';
+        cardNext1.style.zIndex = '20';
+        cardNext1.style.transform = 'translateY(18px) scale(0.96) translateZ(-40px)';
+      }
+
+      // Posicionar tarjeta trasera 2
+      const next2 = (currentCityIndex + 2) % totalCities;
+      const cardNext2 = cards[next2];
+      if (cardNext2) {
+        cardNext2.classList.remove('hidden');
+        cardNext2.style.opacity = '0.55';
+        cardNext2.style.zIndex = '10';
+        cardNext2.style.transform = 'translateY(36px) scale(0.92) translateZ(-80px)';
+      }
+
+      document.getElementById('city-counter-label').innerText = `Ciudad ${currentCityIndex + 1} de ${totalCities}`;
+    }
+
+    function nextCityStack() {
+      currentCityIndex = (currentCityIndex + 1) % totalCities;
+      renderCityStack();
+    }
+
+    function prevCityStack() {
+      currentCityIndex = (currentCityIndex - 1 + totalCities) % totalCities;
+      renderCityStack();
+    }
+
+    function setCityByIndex(idx) {
+      currentCityIndex = idx;
+      renderCityStack();
+    }
+
+    // 7. STEPPER DEL PIPELINE (10 FASES)
+    const pipelineDetails = {
+      1: { title: "Ingesta Masiva y Normalización", badge: "FASE 01 · INGEST", lat: "1-2s", desc: "Recepción mediante Drag-and-drop, ZIP o API. Deduplicación por hash SHA-256 determinista, corrección de orientación EXIF y creación de miniaturas ultraligeras a 640px para vista previa instantánea." },
+      2: { title: "Análisis Visual GLM-4.5v", badge: "FASE 02 · ANALYZE", lat: "Vision Ingest", desc: "Identificación de 15 tipologías de estancias (master bedroom, cocina con isla, terraza, vistas panorámicas), cálculo de luz natural y acabados de lujo para enriquecer el guion cinematográfico." },
+      3: { title: "Director de Cinematografía IA", badge: "FASE 03 · DIRECT", lat: "LLM Director", desc: "Planificación de la cadencia de planos, selección entre 11 movimientos de cámara precalculados (Dolly, Tilt, Drone Elevation) y cálculo de transiciones fluidas de 1.4 a 6.0 segundos." },
+      4: { title: "Renderizado CogVideoX-3", badge: "FASE 04 · RENDER", lat: "GPU Cluster", desc: "Transformación de fotos fijas 2D en secuencias de video hiperrealistas de 5 segundos con prompts de cámara condicionales y consistencia espacial arquitectónica." },
+      5: { title: "Montaje & Xfade con ffmpeg", badge: "FASE 05 · MONTAGE", lat: "Assembly Codec", desc: "Unión determinista de clips con fundidos cruzados xfade a 0.55s. Normalización estricta a 30fps yuv420p con audio sync perfecto." },
+      6: { title: "Síntesis Musical Harmónica", badge: "FASE 06 · MUSIC", lat: "Harmonic PCM", desc: "Generación de banda sonora en 6 estilos cinemáticos libres de derechos, generada en tiempo real sin riesgo de strike en Instagram, TikTok o YouTube." },
+      7: { title: "Locución Neuronal Bilingüe", badge: "FASE 07 · VOICEOVER", lat: "TTS Sidechain", desc: "Narración en español neutro o inglés americano con 4 perfiles de voz neurales. El compresor sidechain de ffmpeg atenúa la música automáticamente mientras habla la voz." },
+      8: { title: "Tour 3D Depth Anything V2", badge: "FASE 08 · 3D TOUR", lat: "Spatial WebGL", desc: "Inferencia monocular de profundidad en un runtime ONNX de tan solo 94MB. Permite al comprador rotar orbitalmente la propiedad desde cualquier navegador móvil o desktop." },
+      9: { title: "Micrositio SSR de Alta Velocidad", badge: "FASE 09 · MICROSITE", lat: "Edge CDN", desc: "Página pública en /p/[slug] con reproductor optimizado, selector de idioma, ficha técnica de la propiedad, código QR vectorial y botón de captura para WhatsApp." },
+      10: { title: "Telemetría y Seguimiento 14 Días", badge: "FASE 10 · TELEMETRY", lat: "Event Stream", desc: "Métricas en tiempo real sobre reproducciones completas, retención de audiencia, escaneos de QR y clics directos al agente por WhatsApp." }
+    };
+
+    function setPipePhase(num) {
+      const data = pipelineDetails[num];
+      if (!data) return;
+
+      document.getElementById('pipe-detail-title').innerText = data.title;
+      document.getElementById('pipe-detail-badge').innerText = data.badge;
+      document.getElementById('pipe-detail-latency').innerText = "Latencia media: " + data.lat;
+      document.getElementById('pipe-detail-desc').innerText = data.desc;
+
+      const buttons = document.querySelectorAll('.phase-btn');
+      buttons.forEach(b => {
+        b.classList.remove('bg-surface-elevated', 'border-primary');
+        b.classList.add('bg-surface-raised', 'border-white/10');
+      });
+
+      const current = document.getElementById('phase-btn-' + num);
+      if (current) {
+        current.classList.remove('bg-surface-raised', 'border-white/10');
+        current.classList.add('bg-surface-elevated', 'border-primary');
+      }
+    }
+
+    // 8. SNIPPETS DE CÓDIGO (MCP / OPENAPI / WEBHOOK)
+    const codeSnippets = {
+      mcp: `<span class="text-slate-500"># Herramienta MCP ejecutable desde Claude Desktop, Cursor o Cline</span>
+<span class="text-primary-glow">curl</span> -X POST https://orbita.alicelabs.site/api/mcp \\
+  -H <span class="text-cyan-light">"Content-Type: application/json"</span> \\
+  -H <span class="text-cyan-light">"Authorization: Bearer orb_sec_live_992a8e1"</span> \\
+  -d <span class="text-champagne-light">'{
+    "jsonrpc": "2.0",
+    "id": "req_orbita_pack",
+    "method": "tools/call",
+    "params": {
+      "name": "generate_property_pack",
+      "arguments": {
+        "property_id": "sky_residence_88",
+        "aspect_ratio": "16:9",
+        "mls_id": "stellar_fl",
+        "compliance_mode": "fha_respa_strict",
+        "audio_style": "ambient_lofi_90bpm"
+      }
+    }
+  }'</span>`,
+      openapi: `<span class="text-slate-500"># Especificación OpenAPI 3.1 & SDK Generator</span>
+<span class="text-primary-glow">GET</span> /api/v1/properties/sky_residence_88/status HTTP/1.1
+<span class="text-on-surface-variant">Host: orbita.alicelabs.site</span>
+<span class="text-on-surface-variant">Authorization: Bearer orb_sec_live_992a8e1</span>
+
+<span class="text-primary-glow">{
+  "status": "completed",
+  "render_time_seconds": 782,
+  "video_urls": {
+    "16_9": "https://cdn.orbita.alicelabs.site/sky_residence_88_16_9.mp4",
+    "9_16": "https://cdn.orbita.alicelabs.site/sky_residence_88_reel.mp4"
+  },
+  "tour_3d_url": "https://orbita.alicelabs.site/p/sky_residence_88/tour"
+}</span>`,
+      webhook: `<span class="text-slate-500"># Webhook de Captura Inmediata hacia WhatsApp Business</span>
+<span class="text-primary-glow">POST</span> /api/webhooks/whatsapp-lead
+<span class="text-cyan-light">{
+  "lead_name": "Carlos Mendoza",
+  "phone": "+13055550189",
+  "property_slug": "sky_residence_88",
+  "intent": "fha_itin_tour_schedule",
+  "preferred_lang": "es-US"
+}</span>`
+    };
+
+    function switchSnippet(type) {
+      document.getElementById('code-canvas').innerHTML = codeSnippets[type];
+      ['mcp', 'openapi', 'webhook'].forEach(t => {
+        const b = document.getElementById('code-btn-' + t);
+        if (t === type) {
+          b.classList.add('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+          b.classList.remove('text-on-surface-variant');
+        } else {
+          b.classList.remove('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+          b.classList.add('text-on-surface-variant');
+        }
+      });
+    }
+
+    function copyCode() {
+      const text = document.getElementById('code-canvas').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-status-text');
+        btn.innerText = "¡Copiado!";
+        setTimeout(() => { btn.innerText = "Copiar"; }, 2000);
+      });
+    }
+
+    // 9. TOGGLE DE PRECIOS
+    function setPricingMode(mode) {
+      const bSingle = document.getElementById('price-toggle-single');
+      const bAgency = document.getElementById('price-toggle-agency');
+
+      if (mode === 'single') {
+        bSingle.classList.add('bg-primary', 'text-surface-base', 'font-bold');
+        bSingle.classList.remove('text-on-surface-variant');
+        bAgency.classList.remove('bg-primary', 'text-surface-base', 'font-bold');
+        bAgency.classList.add('text-on-surface-variant');
+      } else {
+        bAgency.classList.add('bg-primary', 'text-surface-base', 'font-bold');
+        bAgency.classList.remove('text-on-surface-variant');
+        bSingle.classList.remove('bg-primary', 'text-surface-base', 'font-bold');
+        bSingle.classList.add('text-on-surface-variant');
+      }
+    }
+
+    // 10. SELECTOR IDIOMA
+    function setLang(lang) {
+      const bEs = document.getElementById('lang-es');
+      const bEn = document.getElementById('lang-en');
+      if (lang === 'es') {
+        bEs.classList.add('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+        bEs.classList.remove('text-on-surface-variant');
+        bEn.classList.remove('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+        bEn.classList.add('text-on-surface-variant');
+      } else {
+        bEn.classList.add('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+        bEn.classList.remove('text-on-surface-variant');
+        bEs.classList.remove('bg-surface-elevated', 'text-primary-glow', 'font-bold');
+        bEs.classList.add('text-on-surface-variant');
+      }
+    }
+
+    // 11. EFECTO 3D TILT AL MOVER EL CURSOR (LUXURY INTERACTION)
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards3D = document.querySelectorAll('.card-3d');
+      cards3D.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -6;
+          const rotateY = ((x - centerX) / centerX) * 6;
+
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      });
+
+      renderCityStack();
+    });
+  </script>
+</body></html>
