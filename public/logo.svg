@@ -1,17 +1,15 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="148" height="32" viewBox="0 0 148 32" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gold-grad" x1="0" y1="0" x2="64" y2="64">
+    <linearGradient id="lg" x1="0" y1="0" x2="148" y2="32">
       <stop offset="0%" stop-color="#f2ca50"/>
-      <stop offset="50%" stop-color="#e4c287"/>
       <stop offset="100%" stop-color="#d4af37"/>
     </linearGradient>
   </defs>
-  <!-- Outer ring (orbit) -->
-  <circle cx="32" cy="32" r="28" stroke="url(#gold-grad)" stroke-width="1.5" fill="none" opacity="0.4"/>
-  <!-- Orbital ellipse (tilted) -->
-  <ellipse cx="32" cy="32" rx="26" ry="12" stroke="url(#gold-grad)" stroke-width="2" fill="none" transform="rotate(-30 32 32)"/>
-  <!-- Orbiting dot -->
-  <circle cx="52" cy="22" r="3" fill="url(#gold-grad)"/>
-  <!-- Center monogram -->
-  <text x="32" y="42" font-family="Bodoni Moda, serif" font-size="28" font-style="italic" font-weight="400" fill="url(#gold-grad)" text-anchor="middle">Ó</text>
+  <!-- Minimal orbital icon -->
+  <circle cx="14" cy="16" r="11" stroke="url(#lg)" stroke-width="1.5" fill="none" opacity="0.35"/>
+  <ellipse cx="14" cy="16" rx="11" ry="5" stroke="url(#lg)" stroke-width="1.5" fill="none" transform="rotate(-25 14 16)"/>
+  <circle cx="23" cy="11" r="2.5" fill="url(#lg)"/>
+  <circle cx="14" cy="16" r="3" fill="url(#lg)"/>
+  <!-- Wordmark -->
+  <text x="34" y="22" font-family="Bodoni Moda, serif" font-size="18" font-style="italic" font-weight="400" fill="url(#lg)" letter-spacing="0.5">Órbita</text>
 </svg>
