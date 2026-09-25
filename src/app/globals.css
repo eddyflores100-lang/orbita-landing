@@ -4,32 +4,32 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* === Obsidian Orbit design system === */
-  /* Multi-layer midnight surfaces */
-  --color-surface-base: #05070B;
-  --color-surface-dim: #080C12;
-  --color-surface-raised: #0D131D;
-  --color-surface-elevated: #141C2B;
-  --color-surface-bright: #1F2B3E;
+  /* === Haute Luxury Gold design system === */
+  /* Warm dark surfaces (adapted from Stitch design) */
+  --color-surface-base: #0d0e11;
+  --color-surface-dim: #121317;
+  --color-surface-raised: #1a1b1f;
+  --color-surface-elevated: #1e1f23;
+  --color-surface-bright: #38393d;
 
-  /* Luminous accents */
-  --color-primary: #10B981;
-  --color-primary-glow: #34D399;
-  --color-primary-fixed: #6ee7b7;
-  --color-cyan-glow: #06B6D4;
-  --color-cyan-light: #22D3EE;
-  --color-champagne: #F59E0B;
-  --color-champagne-light: #FCD34D;
+  /* Gold luxury accents */
+  --color-primary: #f2ca50;
+  --color-primary-glow: #e9c349;
+  --color-primary-fixed: #ffe088;
+  --color-cyan-glow: #e4c287;
+  --color-cyan-light: #f1c97d;
+  --color-champagne: #f1c97d;
+  --color-champagne-light: #ffdea5;
 
-  /* Text */
-  --color-on-surface: #E2E8F0;
-  --color-on-surface-variant: #94A3B8;
+  /* Warm text */
+  --color-on-surface: #e3e2e6;
+  --color-on-surface-variant: #d0c5af;
 
-  /* Borders */
+  /* Gold borders */
   --color-border-subtle: rgba(255, 255, 255, 0.07);
-  --color-border-specular: rgba(255, 255, 255, 0.16);
-  --color-border-emerald: rgba(16, 185, 129, 0.35);
-  --color-border-cyan: rgba(6, 182, 212, 0.35);
+  --color-border-specular: rgba(242, 202, 80, 0.16);
+  --color-border-emerald: rgba(242, 202, 80, 0.35);
+  --color-border-cyan: rgba(228, 194, 135, 0.35);
 
   /* Keep shadcn/ui tokens working */
   --color-background: var(--color-surface-base);
@@ -38,26 +38,27 @@
   --color-card-foreground: var(--color-on-surface);
   --color-popover: var(--color-surface-elevated);
   --color-popover-foreground: var(--color-on-surface);
-  --color-primary-foreground: var(--color-surface-base);
+  --color-primary-foreground: #241a00;
   --color-secondary: var(--color-surface-raised);
   --color-secondary-foreground: var(--color-on-surface);
   --color-muted: var(--color-surface-raised);
   --color-muted-foreground: var(--color-on-surface-variant);
   --color-accent: var(--color-surface-elevated);
   --color-accent-foreground: var(--color-on-surface);
-  --color-destructive: oklch(0.704 0.191 22.216);
+  --color-destructive: #ffb4ab;
   --color-border: var(--color-border-subtle);
   --color-input: var(--color-surface-raised);
   --color-ring: var(--color-primary-glow);
-  --color-chart-1: #34D399;
-  --color-chart-2: #22D3EE;
-  --color-chart-3: #FBBF24;
-  --color-chart-4: #A78BFA;
-  --color-chart-5: #F472B6;
+  --color-chart-1: #f2ca50;
+  --color-chart-2: #e4c287;
+  --color-chart-3: #f1c97d;
+  --color-chart-4: #d3ad65;
+  --color-chart-5: #ffdea8;
 
-  /* Fonts */
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, monospace;
+  /* Fonts: Bodoni Moda for display, Hanken Grotesk for body */
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-display: var(--font-bodoni), Georgia, serif;
 
   /* Radius */
   --radius-sm: 0.25rem;
@@ -66,7 +67,7 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
 
-  /* === Animations (Obsidian Orbit) === */
+  /* === Animations === */
   --animate-aurora-1: aurora-1 22s ease-in-out infinite alternate;
   --animate-aurora-2: aurora-2 26s ease-in-out infinite alternate;
   --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
@@ -91,11 +92,11 @@
 @keyframes pulse-glow {
   0%, 100% {
     opacity: 0.4;
-    filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+    filter: drop-shadow(0 0 20px rgba(242, 202, 80, 0.3));
   }
   50% {
     opacity: 0.9;
-    filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.6));
+    filter: drop-shadow(0 0 35px rgba(228, 194, 135, 0.6));
   }
 }
 
@@ -131,6 +132,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
   html { scroll-behavior: smooth; }
 }
 
@@ -138,27 +142,27 @@
   /* === Cinema mesh grid background === */
   .cinema-mesh {
     background-image:
-      radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      radial-gradient(rgba(16, 185, 129, 0.05) 1.5px, transparent 1.5px);
+      radial-gradient(rgba(242, 202, 80, 0.06) 1px, transparent 1px),
+      radial-gradient(rgba(228, 194, 135, 0.04) 1.5px, transparent 1.5px);
     background-size: 32px 32px, 96px 96px;
     background-position: 0 0, 16px 16px;
   }
 
   /* === Luxury glass card === */
   .luxury-glass {
-    background: linear-gradient(135deg, rgba(17, 24, 39, 0.72) 0%, rgba(9, 13, 20, 0.88) 100%);
+    background: linear-gradient(135deg, rgba(30, 31, 35, 0.72) 0%, rgba(18, 19, 23, 0.88) 100%);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(242, 202, 80, 0.12);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(242, 202, 80, 0.1);
     transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .luxury-glass:hover {
-    border-color: rgba(52, 211, 153, 0.35);
-    box-shadow: 0 25px 60px -10px rgba(16, 185, 129, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    border-color: rgba(242, 202, 80, 0.35);
+    box-shadow: 0 25px 60px -10px rgba(242, 202, 80, 0.15), inset 0 1px 1px rgba(242, 202, 80, 0.2);
   }
 
-  /* === Specular border (1px gradient sheen) === */
+  /* === Specular border === */
   .specular-border {
     position: relative;
   }
@@ -168,18 +172,18 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(135deg, rgba(242,202,80,0.2) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 100%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
   }
 
-  /* === Primary action glow button === */
+  /* === Gold action glow button === */
   .btn-glow {
-    background: linear-gradient(90deg, #10B981 0%, #34D399 50%, #06B6D4 100%);
-    color: #05070B;
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+    background: linear-gradient(90deg, #f2ca50 0%, #e9c349 50%, #e4c287 100%);
+    color: #241a00;
+    box-shadow: 0 0 25px rgba(242, 202, 80, 0.35);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
@@ -193,29 +197,29 @@
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-glow:hover {
-    box-shadow: 0 0 35px rgba(6, 182, 212, 0.6);
+    box-shadow: 0 0 35px rgba(228, 194, 135, 0.6);
     transform: translateY(-1px);
   }
   .btn-glow:hover::after {
     transform: translateX(100%);
   }
 
-  /* === Hide scrollbar on mobile horizontal scrollers === */
+  /* === Hide scrollbar === */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* === Custom scrollbar === */
+  /* === Custom scrollbar (gold) === */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #05070B; }
-  ::-webkit-scrollbar-thumb { background: #182234; border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+  ::-webkit-scrollbar-track { background: #0d0e11; }
+  ::-webkit-scrollbar-thumb { background: #343538; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #f2ca50; }
 
-  /* === Aurora animated background === */
+  /* === Aurora animated background (gold luxury) === */
   .aurora-bg {
     position: fixed;
     inset: 0;
     z-index: -10;
-    background: #05070B;
+    background: #0d0e11;
     overflow: hidden;
   }
   .aurora-bg::before,
@@ -225,19 +229,19 @@
     width: 60vw;
     height: 60vw;
     border-radius: 9999px;
-    filter: blur(120px);
+    filter: blur(140px);
     will-change: transform;
   }
   .aurora-bg::before {
     top: -10vw;
     left: 5vw;
-    background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.18) 0%, transparent 60%);
+    background: radial-gradient(circle at 50% 50%, rgba(242, 202, 80, 0.15) 0%, transparent 60%);
     animation: var(--animate-aurora-1);
   }
   .aurora-bg::after {
     bottom: -10vw;
     right: 5vw;
-    background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+    background: radial-gradient(circle at 50% 50%, rgba(228, 194, 135, 0.12) 0%, transparent 60%);
     animation: var(--animate-aurora-2);
   }
 
@@ -248,25 +252,25 @@
     width: 6px;
     height: 6px;
     border-radius: 9999px;
-    background: #34D399;
+    background: #f2ca50;
   }
   .pulse-dot::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 9999px;
-    background: #34D399;
+    background: #f2ca50;
     animation: var(--animate-ping-slow);
   }
 
-  /* === Tab pill transition === */
+  /* === Tab pill === */
   .tab-active-pill {
     background: var(--color-surface-elevated);
-    border: 1px solid var(--color-border-specular);
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(242, 202, 80, 0.2);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(242, 202, 80, 0.04);
   }
 
-  /* === Monospace tabular figures === */
+  /* === Tabular nums === */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
