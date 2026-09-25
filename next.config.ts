@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+  async rewrites() {
+    return [
+      { source: "/", destination: "/orbita-landing.html" },
+    ];
+  },
   async headers() {
     return [
       {
