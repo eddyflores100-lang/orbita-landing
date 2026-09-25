@@ -22,7 +22,7 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Órbita Property Engine · Consola de Ultra Lujo & IA Inmobiliaria",
+    default: "Órbita — Property Content Engine for AI agents",
     template: "%s · Órbita",
   },
   description:
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Órbita Property Engine · Consola de Ultra Lujo & IA Inmobiliaria",
+    title: "Órbita — Property Content Engine for AI agents",
     description:
       "Sube las fotos de tu propiedad. Órbita genera video cinematográfico IA, tour 3D interactivo, micrositio con QR y analytics. 18 MLS integrados.",
     url: APP_URL,
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Órbita Property Engine · Consola de Ultra Lujo & IA Inmobiliaria",
+    title: "Órbita — Property Content Engine for AI agents",
     description:
       "Sube las fotos de tu propiedad. Órbita genera video IA + tour 3D + micrositio + analytics.",
     images: ["/logo.svg"],
