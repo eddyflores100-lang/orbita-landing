@@ -1,35 +1,3 @@
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Cookie Policy — Órbita",
-  description: "Cookie usage policy for Órbita Property Content Engine.",
-}
-
-export default function CookiesPage() {
-  return (
-    <main className="bg-surface-base text-on-surface min-h-screen px-4 sm:px-6 lg:px-8 py-32 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-on-surface mb-6">Cookie Policy</h1>
-      <p className="text-sm text-on-surface-variant mb-4">Last updated: September 25, 2026</p>
-      
-      <h2 className="text-xl font-semibold text-on-surface mt-8 mb-3">Cookies We Use</h2>
-      <p className="text-on-surface-variant leading-relaxed mb-4">
-        Órbita uses minimal cookies: language preference (nexus-lang) and session state.
-        We do NOT use third-party tracking cookies (no Google Analytics, no Facebook Pixel).
-        Analytics are opt-in via Plausible (privacy-friendly, no cookies, GDPR-compliant).
-      </p>
-
-      <h2 className="text-xl font-semibold text-on-surface mt-8 mb-3">Third-Party Services</h2>
-      <p className="text-on-surface-variant leading-relaxed mb-4">
-        Tailwind CSS (CDN), Google Fonts (Bodoni Moda, Hanken Grotesk, Plus Jakarta Sans, JetBrains Mono),
-        Material Symbols Outlined. These services may set their own cookies. See Google's privacy policy
-        for details.
-      </p>
-
-      <h2 className="text-xl font-semibold text-on-surface mt-8 mb-3">Managing Cookies</h2>
-      <p className="text-on-surface-variant leading-relaxed mb-4">
-        You can manage cookies in your browser settings. Disabling cookies will not affect
-        the core functionality of Órbita (property enrichment, video generation, analytics).
-      </p>
-    </main>
-  )
-}
+import {OrbitaNavbar} from '@/components/orbita-landing/OrbitaNavbar';
+import {OrbitaFooter} from '@/components/orbita-landing/OrbitaFooter';
+export default function Page(){return <main><OrbitaNavbar/><article style={{maxWidth:900,margin:'50px auto',padding:24,lineHeight:1.8}}><h1 style={{fontSize:38}}>Cookies y almacenamiento</h1><section style={{marginTop:28}}><h2 style={{fontSize:23}}>Página del piloto</h2><p>La nueva portada no incorpora scripts publicitarios, analítica ni cookies de seguimiento. El formulario conserva sus campos solo mientras permanece abierta la página.</p></section><section style={{marginTop:28}}><h2 style={{fontSize:23}}>Servicios externos</h2><p>Si abres tu aplicación de correo o un enlace externo, se aplican las prácticas del servicio correspondiente. El alojamiento puede aplicar controles técnicos independientes del código del sitio.</p></section></article><OrbitaFooter/></main>}

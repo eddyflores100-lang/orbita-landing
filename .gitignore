@@ -71,3 +71,6 @@ download/*.mp4
 .cache/
 .eslintcache
 *.log
+
+out/
+*.tsbuildinfo
