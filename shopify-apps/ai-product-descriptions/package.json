@@ -1,0 +1,14 @@
+{
+  "name": "ai-product-descriptions",
+  "version": "1.0.0",
+  "description": "AI Product Descriptions for Shopify — generate multilingual product descriptions using AI",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^8.0.0"
+  },
+  "license": "MIT",
+  "author": "AliceLabs LLC"
+}

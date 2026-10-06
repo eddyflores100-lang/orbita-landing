@@ -1,0 +1,7 @@
+name = "shopify-app"
+main = "index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+SHOPIFY_APP_URL = "https://shopify-app.eddyflores100.workers.dev"

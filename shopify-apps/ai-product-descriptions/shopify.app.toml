@@ -1,0 +1,7 @@
+app_id = "ai-product-descriptions"
+application_url = "https://shopify-app.eddyflores100.workers.dev"
+embedded = true
+name = "AI Product Descriptions"
+scopes = ["read_products", "write_products"]
+[access_scopes]
+use_legacy_install_flow = false
