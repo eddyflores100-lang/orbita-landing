@@ -1,0 +1,31 @@
+{
+  "name": "@alicelabs/github-mcp",
+  "version": "1.0.0",
+  "description": "GitHub Public MCP server exposing repository search, repo info, issues, READMEs and user profiles via the Model Context Protocol.",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "main": "index.ts",
+  "bin": {
+    "github-mcp": "index.ts"
+  },
+  "scripts": {
+    "start": "bun index.ts",
+    "start:stdio": "bun index.ts",
+    "test": "bun test.ts"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "github",
+    "repositories",
+    "issues",
+    "readme",
+    "claude",
+    "cursor",
+    "ai-tools"
+  ],
+  "author": "AliceLabs",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

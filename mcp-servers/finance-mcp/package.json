@@ -1,0 +1,33 @@
+{
+  "name": "@alicelabs/finance-mcp",
+  "version": "1.0.0",
+  "description": "Finance MCP server exposing live exchange rates, currency conversion, historical rates and cryptocurrency prices via the Model Context Protocol.",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "main": "index.ts",
+  "bin": {
+    "finance-mcp": "index.ts"
+  },
+  "scripts": {
+    "start": "bun index.ts",
+    "start:stdio": "bun index.ts",
+    "test": "bun test.ts"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "exchange-rate",
+    "currency",
+    "crypto",
+    "coingecko",
+    "finance",
+    "latam",
+    "claude",
+    "cursor",
+    "ai-tools"
+  ],
+  "author": "AliceLabs",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

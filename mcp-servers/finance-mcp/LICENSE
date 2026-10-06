@@ -1,0 +1,65 @@
+AL-1.0 -- AliceLabs Source-Available License
+Version 1.0
+
+Copyright (c) 2026 AliceLabs. All rights reserved.
+
+1. Definitions
+
+   "Software" means the contents of this package, including index.ts, test.ts,
+   package.json, README.md and any accompanying files.
+
+   "Permitted Use" means any internal, development, evaluation or personal use
+   of the Software that does not include Redistribution (as defined below) or
+   offering the Software as a hosted or managed service to third parties.
+
+   "Redistribution" means reproducing, sublicensing, selling, distributing,
+   publishing or otherwise making the Software, or a derivative of it, available
+   to any third party, in source or object form, whether commercially or not.
+
+2. Grant of Rights
+
+   Subject to the terms of this License, AliceLabs grants you a worldwide,
+   non-exclusive, non-transferable, non-sublicensable, royalty-free licence to:
+
+     (a) use, copy and modify the Software for Permitted Use; and
+     (b) run the Software locally or in your own infrastructure.
+
+   This source is "source-available": you may read, inspect and modify the source
+   for Permitted Use, but you may not exercise the rights granted under any
+   open-source licence (such as OSI-approved licences) unless AliceLabs provides
+   separate written permission.
+
+3. Restrictions
+
+   You may not:
+
+     (a) Redistribute the Software or any derivative of it without prior
+         written permission from AliceLabs;
+     (b) remove or alter any copyright, attribution or licence notice in the
+         Software; or
+     (c) use the Software to provide, as a commercial service to third parties,
+         the same or substantially similar functionality exposed by the Software,
+         without prior written permission from AliceLabs.
+
+4. Disclaimer
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+
+5. Termination
+
+   This Licence terminates automatically if you breach any of its terms. Upon
+   termination you must cease all use of the Software and destroy all copies.
+
+6. Governing Law
+
+   This Licence is governed by the laws of the jurisdiction in which AliceLabs
+   is established, without regard to its conflict-of-laws provisions.
+
+For permission to Redistribute, offer a hosted service, or obtain a commercial
+licence, contact AliceLabs via https://marketnow.site.

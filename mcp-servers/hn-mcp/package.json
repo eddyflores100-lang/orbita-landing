@@ -1,0 +1,12 @@
+{
+  "name": "@alicelabs/hn-mcp",
+  "version": "1.0.0",
+  "description": "Hacker News MCP server — 6 tools: top stories, best stories, story detail, search, user profiles, new stories. Free APIs, no auth needed.",
+  "main": "index.ts",
+  "scripts": {
+    "start": "npx tsx index.ts",
+    "test": "npx tsx test.ts"
+  },
+  "license": "AL-1.0",
+  "keywords": ["mcp", "hacker-news", "hn", "ai-agent", "claude", "cursor", "model-context-protocol"]
+}
