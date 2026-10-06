@@ -1,0 +1,1 @@
+{"name":"@alicelabs/wikipedia-mcp","version":"1.0.0","main":"index.ts","scripts":{"start":"npx tsx index.ts","test":"npx tsx test.ts"},"license":"AL-1.0","keywords":["mcp","ai-agent","claude","cursor"]}
