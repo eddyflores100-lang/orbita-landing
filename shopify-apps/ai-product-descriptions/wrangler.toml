@@ -5,3 +5,7 @@ workers_dev = true
 
 [vars]
 SHOPIFY_APP_URL = "https://shopify-app.eddyflores100.workers.dev"
+
+[[kv_namespaces]]
+binding = "TOKENS"
+id = "9fff4a309cfa4c88b4b178ce3360ff00"
