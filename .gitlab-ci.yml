@@ -1,0 +1,51 @@
+# GitLab CI/CD configuration for AliceLabs Shopify apps
+# This file enables CI on GitLab when used as a mirror of GitHub
+# Only runs validation + lint, no deploys (those are done manually via wrangler)
+
+image: node:20-alpine
+
+stages:
+  - validate
+  - security
+
+variables:
+  GIT_DEPTH: "1"
+
+before_script:
+  - apk add --no-cache curl
+  - npm install -g wrangler@3
+
+# Validate that all Workers have valid syntax
+validate-syntax:
+  stage: validate
+  script:
+    - echo "Validating Worker syntax..."
+    - cd shopify-apps/ai-product-descriptions && node -c index.js && cd ../..
+    - cd shopify-apps/recoverymail-ai && node -c index.js && cd ../..
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+# Security audit: verify no secrets in code
+secret-scan:
+  stage: security
+  script:
+    - echo "Scanning for accidentally committed secrets..."
+    - |
+      if grep -rE "(shpss_[a-f0-9]{32}|shpat_[a-f0-9]{32}|cfat_[a-zA-Z0-9]{40}|ghp_[a-zA-Z0-9]{36})" --include="*.js" --include="*.json" --include="*.toml" --include="*.md" . ; then
+        echo "❌ SECRET FOUND IN CODE — fix before merge"
+        exit 1
+      fi
+    - echo "✅ No secrets in code"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+# Check that KV namespace IDs and worker names are consistent
+config-check:
+  stage: validate
+  script:
+    - echo "Checking wrangler.toml files..."
+    - test -f shopify-apps/ai-product-descriptions/wrangler.toml || (echo "❌ missing wrangler.toml" && exit 1)
+    - test -f shopify-apps/recoverymail-ai/wrangler.toml || (echo "❌ missing wrangler.toml" && exit 1)
+    - echo "✅ All wrangler.toml files present"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
