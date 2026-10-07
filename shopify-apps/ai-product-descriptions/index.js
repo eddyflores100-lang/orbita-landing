@@ -4,7 +4,8 @@
 // Uses z-ai-web-dev-sdk for AI generation
 // Deployable on Cloudflare Workers
 
-const SCOPES = 'read_products,write_products';
+// Scopes sincronizados con Partner Dashboard → App → Versions → Access scopes
+const SCOPES = 'read_products,write_products,read_product_feeds,write_product_feeds,read_product_listings,write_product_listings,unauthenticated_read_product_pickup_locations,unauthenticated_read_product_inventory,unauthenticated_read_product_listings,unauthenticated_read_product_tags';
 const APP_URL = 'https://shopify-app.eddyflores100.workers.dev';
 const SHOPIFY_API_VERSION = '2024-10';
 
