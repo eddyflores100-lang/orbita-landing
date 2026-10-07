@@ -1,9 +1,10 @@
 #!/usr/bin/env npx tsx
+import { request } from "http";
 const MCP_URL = "http://localhost:3103";
 async function mcpCall(method: string, params?: any): Promise<any> {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params });
-    const req = require("http").request(MCP_URL, { method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) } }, (res: any) => {
+    const req = request(MCP_URL, { method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) } }, (res: any) => {
       let body = ""; res.on("data", (c: any) => (body += c)); res.on("end", () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
     }); req.on("error", reject); req.write(data); req.end();
   });

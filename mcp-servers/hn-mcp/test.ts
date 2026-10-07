@@ -3,14 +3,14 @@
 // Tests: initialize, tools/list, all 6 tools, error handling
 // Run: npx tsx test.ts
 
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { request, IncomingMessage, ServerResponse } from "http";
 
 const MCP_URL = "http://localhost:3101";
 
 async function mcpCall(method: string, params?: any): Promise<any> {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params });
-    const req = require("http").request(MCP_URL, {
+    const req = request(MCP_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) },
     }, (res: IncomingMessage) => {

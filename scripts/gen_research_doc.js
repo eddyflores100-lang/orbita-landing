@@ -1,6 +1,8 @@
 // Shopify Marketing Apps Research Document Generator
 // Built by AliceLabs LLC - Oct 2026
 
+/* eslint-disable @typescript-eslint/no-require-imports -- CommonJS Node script (repo package.json has no type:module) */
+
 const {
   Document, Packer, Paragraph, TextRun, Header, Footer,
   AlignmentType, HeadingLevel, PageNumber, PageBreak,

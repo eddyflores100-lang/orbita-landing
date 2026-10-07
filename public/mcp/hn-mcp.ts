@@ -3,7 +3,8 @@
 // APIs: hn.algolia.com (search) + hacker-news.firebaseio.com (items)
 // No auth, no external deps, Node.js built-in http only
 
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import * as http from "http";
+import * as https from "https";
 
 const PORT = parseInt(process.env.PORT || "3101", 10);
 const cache = new Map<string, { data: any; ts: number }>();
@@ -23,8 +24,8 @@ function setCached(key: string, data: any) {
 
 async function fetchJSON(url: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    const mod = url.startsWith("https") ? require("https") : require("http");
-    mod.get(url, { headers: { "User-Agent": "AliceLabs-HN-MCP/1.0" } }, (res: IncomingMessage) => {
+    const mod = url.startsWith("https") ? https : http;
+    mod.get(url, { headers: { "User-Agent": "AliceLabs-HN-MCP/1.0" } }, (res: http.IncomingMessage) => {
       let data = "";
       res.on("data", (chunk) => (data += chunk));
       res.on("end", () => {
@@ -142,7 +143,7 @@ async function handleToolCall(name: string, args: any): Promise<any> {
 
 // === JSON-RPC 2.0 SERVER ===
 
-const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
