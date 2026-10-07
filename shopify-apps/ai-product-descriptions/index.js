@@ -14,7 +14,7 @@ async function handleInstall(request, url) {
   
   const scopes = 'read_products,write_products';
   const clientId = process.env.SHOPIFY_CLIENT_ID || 'YOUR_APP_CLIENT_ID';
-  const redirectUri = process.env.SHOPIFY_APP_URL || `https://shopify-app.eddyflores100.workers.dev/auth/callback`;
+  const redirectUri = 'https://shopify-app.eddyflores100.workers.dev/auth/callback';
   
   const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=${btoa(shop)}`;
   
