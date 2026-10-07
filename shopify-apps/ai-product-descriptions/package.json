@@ -1,14 +1,14 @@
 {
   "name": "ai-product-descriptions",
-  "version": "1.0.0",
-  "description": "AI Product Descriptions for Shopify — generate multilingual product descriptions using AI",
+  "version": "2.0.0",
+  "description": "AI Product Descriptions for Shopify — generate multilingual product descriptions using AI (ES/EN/PT)",
+  "main": "index.js",
   "scripts": {
-    "dev": "node index.js",
-    "start": "node index.js"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --name shopify-app --compatibility-date 2026-09-01"
   },
-  "dependencies": {
-    "@shopify/shopify-api": "^8.0.0"
-  },
+  "author": "AliceLabs LLC",
   "license": "MIT",
-  "author": "AliceLabs LLC"
+  "keywords": ["shopify", "shopify-app", "ai", "product-descriptions", "multilingual"],
+  "homepage": "https://shopify-app.eddyflores100.workers.dev"
 }

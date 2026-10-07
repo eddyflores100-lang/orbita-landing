@@ -1,0 +1,47 @@
+app_id = "recoverymail-ai"
+application_url = "https://recoverymail-ai.eddyflores100.workers.dev"
+embedded = true
+name = "RecoveryMail AI"
+scopes = ["read_products", "write_products", "read_customers", "read_orders", "write_orders", "read_inventory", "write_inventory"]
+
+[access_scopes]
+use_legacy_install_flow = false
+
+[webhooks]
+api_version = "2024-10"
+
+[[webhooks.subscriptions]]
+topic = "carts/update"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "carts/create"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "checkouts/create"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "checkouts/update"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "orders/create"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "app/uninstalled"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/abandoned-cart"
+
+[[webhooks.subscriptions]]
+topic = "customers/redact"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/gdpr/customers-redact"
+
+[[webhooks.subscriptions]]
+topic = "shop/redact"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/gdpr/shop-redact"
+
+[[webhooks.subscriptions]]
+topic = "customers/data_request"
+address = "https://recoverymail-ai.eddyflores100.workers.dev/webhooks/gdpr/data-request"

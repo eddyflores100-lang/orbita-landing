@@ -8,11 +8,90 @@
 const SCOPES = 'read_products,write_products,read_product_feeds,write_product_feeds,read_product_listings,write_product_listings,unauthenticated_read_product_pickup_locations,unauthenticated_read_product_inventory,unauthenticated_read_product_listings,unauthenticated_read_product_tags';
 const APP_URL = 'https://shopify-app.eddyflores100.workers.dev';
 const SHOPIFY_API_VERSION = '2024-10';
+const RATE_LIMIT_PER_MIN = 20;
+
+// === SECURITY HELPERS ===
+function escapeHTML(str) {
+  if (typeof str !== 'string') str = String(str || '');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function verifyShopifyWebhook(request, body) {
+  const hmacHeader = request.headers.get('X-Shopify-Hmac-Sha256');
+  if (!hmacHeader) return false;
+  const clientSecret = globalThis.SHOPIFY_CLIENT_SECRET;
+  if (!clientSecret || clientSecret === 'YOUR_APP_SECRET') return false;
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(clientSecret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+    const digest = btoa(String.fromCharCode(...new Uint8Array(sig)));
+    return digest === hmacHeader;
+  } catch (e) { console.log('HMAC error:', e.message); return false; }
+}
+
+async function checkRateLimit(env, ip, endpoint) {
+  if (!env.TOKENS) return true;
+  const key = `rate:${endpoint}:${ip}:${Math.floor(Date.now() / 60000)}`;
+  try {
+    const raw = await env.TOKENS.get(key);
+    const count = raw ? parseInt(raw) : 0;
+    if (count >= RATE_LIMIT_PER_MIN) return false;
+    await env.TOKENS.put(key, String(count + 1), { expirationTtl: 120 });
+    return true;
+  } catch (e) { return true; }
+}
+
+function isValidShopDomain(shop) {
+  if (!shop || typeof shop !== 'string') return false;
+  return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(shop);
+}
+
+async function registerWebhooks(shop, accessToken) {
+  const topics = ['products/create', 'products/update', 'app/uninstalled'];
+  const webhookUrl = `${APP_URL}/webhooks/products`;
+  const results = [];
+  for (const topic of topics) {
+    try {
+      const res = await fetch(`https://${shop}/admin/api/${SHOPIFY_API_VERSION}/webhooks.json`, {
+        method: 'POST',
+        headers: { 'X-Shopify-Access-Token': accessToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook: { topic, address: webhookUrl, format: 'json' } })
+      });
+      results.push({ topic, status: res.status, ok: res.ok });
+    } catch (e) { results.push({ topic, ok: false, error: e.message }); }
+  }
+  return results;
+}
+
+async function registerGDPRWebhooks(shop, accessToken) {
+  const gdprTopics = [
+    { topic: 'customers/redact', address: `${APP_URL}/webhooks/gdpr/customers-redact` },
+    { topic: 'shop/redact', address: `${APP_URL}/webhooks/gdpr/shop-redact` },
+    { topic: 'customers/data_request', address: `${APP_URL}/webhooks/gdpr/data-request` }
+  ];
+  for (const { topic, address } of gdprTopics) {
+    try {
+      await fetch(`https://${shop}/admin/api/${SHOPIFY_API_VERSION}/webhooks.json`, {
+        method: 'POST',
+        headers: { 'X-Shopify-Access-Token': accessToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook: { topic, address, format: 'json' } })
+      });
+    } catch (e) {}
+  }
+}
 
 // === SHOPIFY OAUTH INSTALL ===
 async function handleInstall(request, url) {
   let shop = url.searchParams.get('shop') || '';
-  // Normaliza: quita https://, http://, paths, etc. Solo deja el dominio .myshopify.com
   shop = shop.trim().toLowerCase()
     .replace(/^https?:\/\//, '')
     .replace(/^www\./, '')
@@ -20,21 +99,19 @@ async function handleInstall(request, url) {
   if (!shop.endsWith('.myshopify.com')) {
     shop = `${shop}.myshopify.com`.replace(/\.myshopify\.myshopify\.com$/, '.myshopify.com');
   }
-  if (!shop || shop === '.myshopify.com') {
+  if (!shop || shop === '.myshopify.com' || !isValidShopDomain(shop)) {
     return new Response(installFormHTML(), { headers: { 'Content-Type': 'text/html' } });
   }
 
-  const clientId = env_ShopifyClientId();
+  const clientId = globalThis.SHOPIFY_CLIENT_ID || 'YOUR_APP_CLIENT_ID';
   if (!clientId || clientId === 'YOUR_APP_CLIENT_ID') {
     return new Response(errorHTML('SHOPIFY_CLIENT_ID no configurado en el Worker. Ejecuta: wrangler secret put SHOPIFY_CLIENT_ID'), { headers: { 'Content-Type': 'text/html' } });
   }
 
   const redirectUri = `${APP_URL}/auth/callback`;
-  // State con nonce simple para CSRF protection
   const state = `${btoa(shop)}.${Date.now()}.${Math.random().toString(36).slice(2)}`;
   const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=${encodeURIComponent(state)}`;
 
-  // Guarda state en cookie para verificar en callback (CSRF protection)
   return new Response(null, {
     status: 302,
     headers: {
@@ -53,26 +130,24 @@ async function handleCallback(request, url) {
   const errorDescription = url.searchParams.get('error_description');
 
   if (error) {
-    return new Response(errorHTML(`Shopify rechazó la instalación: ${error} - ${errorDescription || ''}`), { headers: { 'Content-Type': 'text/html' } });
+    return new Response(errorHTML(`Shopify rechazó la instalación: ${escapeHTML(error)} - ${escapeHTML(errorDescription || '')}`), { headers: { 'Content-Type': 'text/html' } });
   }
-  if (!code || !shop) {
-    return new Response(errorHTML('Falta code o shop en el callback. Vuelve a intentarlo desde /install'), { headers: { 'Content-Type': 'text/html' } });
+  if (!code || !shop || !isValidShopDomain(shop)) {
+    return new Response(errorHTML('Parámetros inválidos'), { headers: { 'Content-Type': 'text/html' } });
   }
 
-  // Verifica state CSRF (si cookie existe)
   const cookieHeader = request.headers.get('Cookie') || '';
   const cookies = Object.fromEntries(cookieHeader.split(';').map(c => c.trim().split('=')));
   if (cookies.oauth_state && cookies.oauth_state !== state) {
     return new Response(errorHTML('State CSRF mismatch. Vuelve a intentarlo desde /install'), { headers: { 'Content-Type': 'text/html' } });
   }
 
-  const clientId = env_ShopifyClientId();
-  const clientSecret = env_ShopifyClientSecret();
-  if (!clientId || !clientSecret) {
+  const clientId = globalThis.SHOPIFY_CLIENT_ID || 'YOUR_APP_CLIENT_ID';
+  const clientSecret = globalThis.SHOPIFY_CLIENT_SECRET || 'YOUR_APP_SECRET';
+  if (!clientId || clientId === 'YOUR_APP_CLIENT_ID' || !clientSecret || clientSecret === 'YOUR_APP_SECRET') {
     return new Response(errorHTML('Credenciales Shopify no configuradas en el Worker.'), { headers: { 'Content-Type': 'text/html' } });
   }
 
-  // Exchange code for access token
   let tokenData;
   try {
     const tokenRes = await fetch(`https://${shop}/admin/oauth/access_token`, {
@@ -82,27 +157,25 @@ async function handleCallback(request, url) {
     });
     tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
-      return new Response(errorHTML(`No se obtuvo access_token. Respuesta Shopify: ${JSON.stringify(tokenData)}`), { headers: { 'Content-Type': 'text/html' } });
+      return new Response(errorHTML(`No se obtuvo access_token. Respuesta Shopify: ${escapeHTML(JSON.stringify(tokenData))}`), { headers: { 'Content-Type': 'text/html' } });
     }
   } catch (e) {
-    return new Response(errorHTML(`Error intercambiando code por token: ${e.message}`), { headers: { 'Content-Type': 'text/html' } });
+    return new Response(errorHTML(`Error intercambiando code por token: ${escapeHTML(e.message)}`), { headers: { 'Content-Type': 'text/html' } });
   }
 
   const accessToken = tokenData.access_token;
   const scope = tokenData.scope || SCOPES;
 
-  // Guarda token en KV (clave por shop)
   try {
-    if (env_TOKENS && env_TOKENS.put) {
-      await env_TOKENS.put(shop, JSON.stringify({ accessToken, scope, installedAt: new Date().toISOString() }));
+    if (globalThis.env_TOKENS && globalThis.env_TOKENS.put) {
+      await globalThis.env_TOKENS.put(shop, JSON.stringify({ accessToken, scope, installedAt: new Date().toISOString() }));
     }
-  } catch (e) {
-    // KV no configurado — no es fatal, el token se puede usar en esta sesión
-    console.log('KV no disponible, token no persistido:', e.message);
-  }
+  } catch (e) { console.log('KV put failed:', e.message); }
 
-  // Redirige a la app embedded dentro del admin de Shopify
-  const appEmbeddedUrl = `https://${shop}/admin/apps/ai-product-descriptions`;
+  // Register webhooks + GDPR webhooks
+  await registerWebhooks(shop, accessToken);
+  await registerGDPRWebhooks(shop, accessToken);
+
   return new Response(successHTML(shop), {
     status: 200,
     headers: {
@@ -204,21 +277,39 @@ function templateDescription(productTitle, productType, tags, language) {
     `Buy today and take your experience to the next level with a product that exceeds expectations.`;
 }
 
-// === WEBHOOK HANDLER ===
+// === WEBHOOK HANDLER (with HMAC verification) ===
 async function handleWebhook(request, url) {
   const shop = request.headers.get('X-Shopify-Shop-Domain');
   const topic = request.headers.get('X-Shopify-Topic');
-  const hmac = request.headers.get('X-Shopify-Hmac-Sha256');
+  if (!shop || !isValidShopDomain(shop)) return json({ error: 'Invalid shop' }, 400);
+  if (!topic) return json({ error: 'No topic' }, 400);
 
+  const rawBody = await request.text();
   let body;
-  try { body = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }
+  try { body = JSON.parse(rawBody); } catch { return json({ error: 'Invalid JSON' }, 400); }
+
+  // Verify HMAC signature
+  const hmacOk = await verifyShopifyWebhook(request, rawBody);
+  if (!hmacOk) {
+    console.log(`Webhook HMAC failed shop=${shop} topic=${topic}`);
+    return json({ error: 'HMAC verification failed' }, 401);
+  }
+
+  // Handle app/uninstalled: cleanup
+  if (topic === 'app/uninstalled') {
+    try {
+      if (globalThis.env_TOKENS && globalThis.env_TOKENS.delete) {
+        await globalThis.env_TOKENS.delete(shop);
+      }
+    } catch (e) {}
+    return json({ received: true, action: 'uninstalled' });
+  }
 
   if (topic === 'products/create' || topic === 'products/update') {
-    // Recupera el token de la tienda desde KV
     let token = null;
     try {
-      if (env_TOKENS && env_TOKENS.get) {
-        const raw = await env_TOKENS.get(shop);
+      if (globalThis.env_TOKENS && globalThis.env_TOKENS.get) {
+        const raw = await globalThis.env_TOKENS.get(shop);
         if (raw) token = JSON.parse(raw).accessToken;
       }
     } catch (e) { console.log('KV get failed:', e.message); }
@@ -231,15 +322,32 @@ async function handleWebhook(request, url) {
     );
 
     if (token) {
-      await fetch(`https://${shop}/admin/api/${SHOPIFY_API_VERSION}/products/${body.id}.json`, {
-        method: 'PUT',
-        headers: { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: { id: body.id, body_html: `<p>${description}</p>` } }),
-      });
+      try {
+        await fetch(`https://${shop}/admin/api/${SHOPIFY_API_VERSION}/products/${body.id}.json`, {
+          method: 'PUT',
+          headers: { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: { id: body.id, body_html: `<p>${escapeHTML(description)}</p>` } }),
+        });
+      } catch (e) { console.log('Product update failed:', e.message); }
     }
   }
 
   return json({ received: true });
+}
+
+// === GDPR WEBHOOKS ===
+async function handleGDPRWebhook(request, url, type) {
+  const shop = request.headers.get('X-Shopify-Shop-Domain');
+  if (!shop) return json({ error: 'No shop' }, 400);
+  const rawBody = await request.text();
+  const hmacOk = await verifyShopifyWebhook(request, rawBody);
+  if (!hmacOk) return json({ error: 'HMAC failed' }, 401);
+  try {
+    if (globalThis.env_TOKENS && globalThis.env_TOKENS.delete) {
+      await globalThis.env_TOKENS.delete(shop);
+    }
+  } catch (e) {}
+  return json({ received: true, type, processedAt: new Date().toISOString() });
 }
 
 // === EMBEDDED APP FRONTEND ===
@@ -347,7 +455,7 @@ function generateAppHTML(shop, isEmbedded) {
 function debugHTML(kvKeys, shop, envInfo) {
   return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Debug</title><script src="https://cdn.tailwindcss.com"></script></head>
 <body class="bg-gray-900 text-gray-100 min-h-screen p-6 font-mono text-sm">
-<h1 class="text-2xl mb-4 text-green-400">Debug — Worker status</h1>
+<h1 class="text-2xl mb-4 text-green-400">Debug — Worker status v2.0.0</h1>
 <div class="mb-4"><strong>App URL:</strong> ${APP_URL}</div>
 <div class="mb-4"><strong>Shopify API version:</strong> ${SHOPIFY_API_VERSION}</div>
 <div class="mb-4"><strong>Scopes:</strong> <code class="text-xs break-all">${SCOPES}</code></div>
@@ -414,6 +522,7 @@ function installFormHTML() {
 }
 
 function successHTML(shop) {
+  const safeShop = escapeHTML(shop);
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -430,20 +539,16 @@ function successHTML(shop) {
     </div>
     <h1 class="text-3xl font-bold text-green-700 mb-2">App Installed!</h1>
     <p class="text-gray-600 mb-1">AI Product Descriptions está activa en</p>
-    <p class="font-mono text-gray-900 mb-6">${shop}</p>
-
-    <a href="https://${shop}/admin/apps/ai-product-descriptions" class="block w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition mb-2">
-      Abrir la App
-    </a>
-    <a href="${APP_URL}/app" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition">
-      Ver landing pública
-    </a>
+    <p class="font-mono text-gray-900 mb-6">${safeShop}</p>
+    <a href="https://${safeShop}/admin/apps/ai-product-descriptions" class="block w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition mb-2">Abrir la App</a>
+    <a href="${APP_URL}/app" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition">Ver landing pública</a>
   </div>
 </body>
 </html>`;
 }
 
 function errorHTML(message) {
+  const safeMsg = escapeHTML(message);
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -461,13 +566,40 @@ function errorHTML(message) {
       </svg>
     </div>
     <h1 class="text-2xl font-bold text-red-700 mb-2">No se pudo instalar</h1>
-    <p class="text-gray-700 mb-6 text-sm break-words">${message}</p>
-    <a href="${APP_URL}/install" class="block w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition">
-      Reintentar
-    </a>
+    <p class="text-gray-700 mb-6 text-sm break-words">${safeMsg}</p>
+    <a href="${APP_URL}/install" class="block w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition">Reintentar</a>
   </div>
 </body>
 </html>`;
+}
+
+function privacyPolicyHTML() {
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Privacy Policy</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-50 min-h-screen p-6"><div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-8">
+<h1 class="text-3xl font-bold mb-4">Privacy Policy</h1>
+<p class="text-sm text-gray-500 mb-6">Last updated: October 2026 · AliceLabs LLC</p>
+<div class="prose prose-sm text-gray-700 space-y-4">
+<p><strong>Data collected:</strong> Shopify store URL, OAuth access token (encrypted), and webhook events for products. We do NOT collect customer PII directly.</p>
+<p><strong>How we use data:</strong> We process product titles and tags to generate AI descriptions. No customer data is processed by this app.</p>
+<p><strong>Storage:</strong> Cloudflare Workers KV (encrypted at rest). Tokens stored per-shop with scoped permissions.</p>
+<p><strong>Deletion:</strong> Uninstall triggers app/uninstalled webhook → we delete your token immediately. GDPR requests honored within 24 hours.</p>
+<p><strong>Contact:</strong> AliceLabs LLC · Sheridan, Wyoming, USA · hello@alicelabs.site</p>
+</div></div></body></html>`;
+}
+
+function termsHTML() {
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Terms of Service</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-50 min-h-screen p-6"><div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-8">
+<h1 class="text-3xl font-bold mb-4">Terms of Service</h1>
+<p class="text-sm text-gray-500 mb-6">Last updated: October 2026 · AliceLabs LLC</p>
+<div class="prose prose-sm text-gray-700 space-y-4">
+<p><strong>1. Service:</strong> AI Product Descriptions generates AI-powered product descriptions for your Shopify store.</p>
+<p><strong>2. Plans:</strong> Beta phase: free for dev stores. Production pricing TBD when published to App Store.</p>
+<p><strong>3. Acceptable use:</strong> No spam, no abuse, no reselling the API.</p>
+<p><strong>4. Data:</strong> See Privacy Policy. You are responsible for accuracy of AI-generated content published to your store.</p>
+<p><strong>5. Liability:</strong> AliceLabs is not liable for any damages arising from use of the service.</p>
+<p><strong>6. Contact:</strong> AliceLabs LLC · Sheridan, Wyoming, USA · hello@alicelabs.site</p>
+</div></div></body></html>`;
 }
 
 function json(data, status = 200) {
@@ -485,7 +617,6 @@ function env_ShopifyClientSecret() {
 // === CLOUDFLARE WORKERS ENTRY ===
 export default {
   async fetch(request, env) {
-    // Expose env to module-scope helpers via global
     globalThis.env_TOKENS = env.TOKENS || null;
     globalThis.SHOPIFY_CLIENT_ID = env.SHOPIFY_CLIENT_ID;
     globalThis.SHOPIFY_CLIENT_SECRET = env.SHOPIFY_CLIENT_SECRET;
@@ -494,29 +625,37 @@ export default {
     globalThis.ZAI_USER_ID = env.ZAI_USER_ID;
 
     const url = new URL(request.url);
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-    if (url.pathname === '/install') return await handleInstall(request, url);
+    if (url.pathname === '/install') {
+      if (!(await checkRateLimit(env, ip, 'install'))) return json({ error: 'Rate limit exceeded' }, 429);
+      return await handleInstall(request, url);
+    }
     if (url.pathname === '/auth/callback') return await handleCallback(request, url);
     if (url.pathname === '/webhooks/products') return await handleWebhook(request, url);
+    if (url.pathname === '/webhooks/gdpr/customers-redact') return await handleGDPRWebhook(request, url, 'customers/redact');
+    if (url.pathname === '/webhooks/gdpr/shop-redact') return await handleGDPRWebhook(request, url, 'shop/redact');
+    if (url.pathname === '/webhooks/gdpr/data-request') return await handleGDPRWebhook(request, url, 'customers/data_request');
     if (url.pathname === '/api/generate') {
+      if (!(await checkRateLimit(env, ip, 'generate'))) return json({ error: 'Rate limit exceeded' }, 429);
       const body = await request.json();
       const desc = await generateDescription(body.title, body.product_type || 'general', body.tags || '', body.language || 'es');
       return json({ description: desc });
     }
     if (url.pathname === '/' || url.pathname === '/app') {
-      // Cuando la app está embedded en el admin de Shopify, el iframe recibe ?shop=...
-      // como parámetro de URL o cookie. Lo usamos para detectar la tienda.
       const shopFromUrl = url.searchParams.get('shop') || '';
       const shopFromCookie = (request.headers.get('Cookie') || '').match(/shop=([^;]+)/)?.[1] || '';
-      const shop = shopFromUrl || shopFromCookie;
+      const shop = escapeHTML(shopFromUrl || shopFromCookie);
       const isEmbedded = url.searchParams.has('shop') || url.searchParams.has('host') || request.headers.get('Sec-Fetch-Dest') === 'iframe';
       return new Response(generateAppHTML(shop, isEmbedded), { headers: { 'Content-Type': 'text/html' } });
     }
+    if (url.pathname === '/privacy-policy') return new Response(privacyPolicyHTML(), { headers: { 'Content-Type': 'text/html' } });
+    if (url.pathname === '/terms') return new Response(termsHTML(), { headers: { 'Content-Type': 'text/html' } });
 
     if (url.pathname === '/debug') {
       const shopFromUrl = url.searchParams.get('shop') || '';
       const shopFromCookie = (request.headers.get('Cookie') || '').match(/shop=([^;]+)/)?.[1] || '';
-      const shop = shopFromUrl || shopFromCookie;
+      const shop = escapeHTML(shopFromUrl || shopFromCookie);
       let kvKeys = [];
       try {
         if (env.TOKENS && env.TOKENS.list) {
@@ -524,10 +663,10 @@ export default {
           kvKeys = result.keys || [];
         }
       } catch (e) { kvKeys = [{ error: e.message }]; }
-      const envInfo = `KV=${env.TOKENS ? 'yes' : 'no'}, CLIENT_ID=${env.SHOPIFY_CLIENT_ID ? 'set' : 'MISSING'}, CLIENT_SECRET=${env.SHOPIFY_CLIENT_SECRET ? 'set' : 'MISSING'}`;
+      const envInfo = `KV=${env.TOKENS ? 'yes' : 'no'}, CLIENT_ID=${env.SHOPIFY_CLIENT_ID ? 'set' : 'MISSING'}, CLIENT_SECRET=${env.SHOPIFY_CLIENT_SECRET ? 'set' : 'MISSING'}, ZAI=${env.ZAI_TOKEN ? 'set' : 'MISSING'}`;
       return new Response(debugHTML(kvKeys, shop, envInfo), { headers: { 'Content-Type': 'text/html' } });
     }
 
-    return json({ name: 'ai-product-descriptions', version: '1.2.0', endpoints: ['/install', '/auth/callback', '/webhooks/products', '/api/generate', '/app', '/debug'] });
+    return json({ name: 'ai-product-descriptions', version: '2.0.0', endpoints: ['/install', '/auth/callback', '/webhooks/products', '/webhooks/gdpr/*', '/api/generate', '/app', '/privacy-policy', '/terms', '/debug'] });
   }
 };
