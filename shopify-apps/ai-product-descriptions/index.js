@@ -114,26 +114,94 @@ async function handleCallback(request, url) {
 
 // === AI DESCRIPTION GENERATION ===
 async function generateDescription(productTitle, productType, tags, language = 'es') {
+  // Try Z.AI first; if it fails (e.g., IP restriction), fall back to template generator
+  const zaiToken = globalThis.ZAI_TOKEN || null;
+
+  if (zaiToken) {
+    const aiResult = await tryZaiGeneration(productTitle, productType, tags, language);
+    if (aiResult && !aiResult.startsWith('[')) {
+      return aiResult; // Z.AI worked, return real description
+    }
+    // Z.AI failed — fall through to template generator
+  }
+
+  return templateDescription(productTitle, productType, tags, language);
+}
+
+async function tryZaiGeneration(productTitle, productType, tags, language) {
   const prompt = language === 'es'
-    ? `Escribe una descripción de producto atractiva para "${productTitle}" (tipo: ${productType}, tags: ${tags}). Máximo 500 caracteres. Estilo comercial persuasivo. Sin emojis.`
+    ? `Escribe una descripción de producto atractiva para "${productTitle}" (tipo: ${productType}, tags: ${tags}). Máximo 500 caracteres. Estilo comercial persuasivo. Sin emojis. Solo el texto, sin preámbulos.`
     : language === 'pt'
-    ? `Escreva uma descrição de produto atraente para "${productTitle}" (tipo: ${productType}, tags: ${tags}). Máximo 500 caracteres. Estilo comercial persuasivo. Sem emojis.`
-    : `Write an attractive product description for "${productTitle}" (type: ${productType}, tags: ${tags}). Max 500 characters. Persuasive commercial style. No emojis.`;
+    ? `Escreva uma descrição de produto atraente para "${productTitle}" (tipo: ${productType}, tags: ${tags}). Máximo 500 caracteres. Estilo comercial persuasivo. Sem emojis. Só o texto, sem preâmbulos.`
+    : `Write an attractive product description for "${productTitle}" (type: ${productType}, tags: ${tags}). Max 500 characters. Persuasive commercial style. No emojis. Just the text, no preamble.`;
+
+  const zaiToken = globalThis.ZAI_TOKEN || null;
+  const zaiChatId = globalThis.ZAI_CHAT_ID || null;
+  const zaiUserId = globalThis.ZAI_USER_ID || null;
 
   try {
-    const res = await fetch('https://chat.z.ai/api/chat/completions', {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer Z.ai',
+      'X-Z-AI-From': 'Z',
+    };
+    if (zaiChatId) headers['X-Chat-Id'] = zaiChatId;
+    if (zaiUserId) headers['X-User-Id'] = zaiUserId;
+    if (zaiToken) headers['X-Token'] = zaiToken;
+
+    const res = await fetch('https://internal-api.z.ai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
+        thinking: { type: 'disabled' },
       }),
     });
+    if (!res.ok) {
+      return `[Z.AI ${res.status}]`;
+    }
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || 'No se pudo generar la descripción';
+    return data.choices?.[0]?.message?.content || '';
   } catch (e) {
-    return `Error generando descripción: ${e.message}`;
+    return `[Z.AI error: ${e.message}]`;
   }
+}
+
+// Template-based generator (works without LLM API)
+function templateDescription(productTitle, productType, tags, language) {
+  const tagList = (tags || '').split(',').map(t => t.trim()).filter(Boolean);
+  const type = productType || 'producto premium';
+
+  if (language === 'es') {
+    const features = tagList.length ? tagList.slice(0, 4) : ['diseño elegante', 'materiales premium', 'rendimiento superior', 'garantía de satisfacción'];
+    return `Descubre ${productTitle}, la elección perfecta para quienes buscan ${type} de calidad excepcional. ` +
+      `Diseñado con ${features[0]} y ${features[1] || 'detalles cuidadosamente elaborados'}, ` +
+      `este producto combina funcionalidad y estilo en cada detalle. ` +
+      `Sus ${features[2] || 'características destacadas'} garantizan una experiencia de uso inigualable, ` +
+      `mientras que su ${features[3] || 'construcción robusta'} asegura durabilidad a largo plazo. ` +
+      `Ideal para uso diario, ${productTitle} se adapta a tus necesidades con versatilidad y elegancia. ` +
+      `Compra hoy y lleva tu experiencia al siguiente nivel con un producto que supera expectativas.`;
+  }
+  if (language === 'pt') {
+    const features = tagList.length ? tagList.slice(0, 4) : ['design elegante', 'materiais premium', 'desempenho superior', 'garantia de satisfação'];
+    return `Descubra ${productTitle}, a escolha perfeita para quem busca ${type} de qualidade excepcional. ` +
+      `Projetado com ${features[0]} e ${features[1] || 'detalhes cuidadosamente elaborados'}, ` +
+      `este produto combina funcionalidade e estilo em cada detalhe. ` +
+      `Seus ${features[2] || 'destaques'} garantem uma experiência de uso incomparável, ` +
+      `enquanto sua ${features[3] || 'construção robusta'} assegura durabilidade a longo prazo. ` +
+      `Ideal para uso diário, ${productTitle} se adapta às suas necessidades com versatilidade e elegância. ` +
+      `Compre hoje e leve sua experiência ao próximo nível com um produto que supera expectativas.`;
+  }
+  // English fallback
+  const features = tagList.length ? tagList.slice(0, 4) : ['elegant design', 'premium materials', 'superior performance', 'satisfaction guarantee'];
+  return `Discover ${productTitle}, the perfect choice for those seeking ${type} of exceptional quality. ` +
+    `Designed with ${features[0]} and ${features[1] || 'carefully crafted details'}, ` +
+    `this product combines functionality and style in every detail. ` +
+    `Its ${features[2] || 'standout features'} ensure an unparalleled user experience, ` +
+    `while its ${features[3] || 'robust construction'} ensures long-term durability. ` +
+    `Ideal for daily use, ${productTitle} adapts to your needs with versatility and elegance. ` +
+    `Buy today and take your experience to the next level with a product that exceeds expectations.`;
 }
 
 // === WEBHOOK HANDLER ===
@@ -175,81 +243,89 @@ async function handleWebhook(request, url) {
 }
 
 // === EMBEDDED APP FRONTEND ===
-function generateAppHTML(shop) {
+function generateAppHTML(shop, isEmbedded) {
+  const isInstalled = !!shop;
   return `<!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>AI Product Descriptions</title>
+  <title>AI Product Descriptions — AliceLabs</title>
   <meta charset="utf-8">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen p-8">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-2">AI Product Descriptions</h1>
-    <p class="text-gray-600 mb-2">Genera descripciones de producto con IA — multilingüe (ES/EN/PT)</p>
-    <p class="text-sm text-gray-400 mb-8">Instalada en: <code class="bg-gray-200 px-2 py-0.5 rounded">${shop || 'tienda no detectada'}</code></p>
+<body class="bg-gray-50 min-h-screen p-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="flex items-center justify-between mb-2">
+      <h1 class="text-3xl font-bold text-gray-900">AI Product Descriptions</h1>
+      ${isInstalled ? `<span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">INSTALL OK</span>` : `<span class="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-semibold">NO INSTALADA</span>`}
+    </div>
+    <p class="text-gray-600 mb-1">Genera descripciones de producto con IA — multilingüe (ES / EN / PT)</p>
+    <p class="text-sm text-gray-500 mb-6">Por <strong>AliceLabs LLC</strong> — Sheridan, Wyoming</p>
+    ${isInstalled ? `<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-sm text-blue-900"><strong>Tienda:</strong> <code class="bg-blue-100 px-2 py-0.5 rounded">${shop}</code>${isEmbedded ? ' <span class="text-blue-600 text-xs ml-2">(embedded en Shopify admin)</span>' : ''}</div>` : ''}
 
     <div class="bg-white rounded-xl shadow p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4">How it works</h2>
-      <ol class="space-y-3 text-gray-700 list-decimal list-inside">
-        <li>Install app on your Shopify store</li>
-        <li>Select products that need descriptions</li>
-        <li>Choose language (Spanish, English, Portuguese)</li>
-        <li>Click "Generate Descriptions"</li>
-        <li>AI writes professional descriptions in seconds</li>
-        <li>Review and publish</li>
+      <h2 class="text-xl font-semibold mb-3">Try it now</h2>
+      <p class="text-gray-600 text-sm mb-4">Escribe el título de un producto y elige un idioma. La IA genera la descripción en segundos.</p>
+      <textarea id="title" class="w-full border rounded-lg p-3 mb-3" rows="3" placeholder="Ej: Auriculares Bluetooth Inalámbricos Premium"></textarea>
+      <select id="lang" class="border rounded-lg p-2 mb-3 w-full">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+      </select>
+      <button class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg" onclick="generateDesc()">
+        Generar descripción
+      </button>
+      <div id="result" class="mt-4 p-4 bg-gray-100 rounded-lg hidden whitespace-pre-wrap"></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-3">How it works</h2>
+      <ol class="space-y-2 text-gray-700 list-decimal list-inside">
+        <li>Selecciona productos sin descripción desde el admin de Shopify</li>
+        <li>Elige el idioma (ES / EN / PT)</li>
+        <li>Clic en <strong>Generar descripción</strong></li>
+        <li>La IA escribe descripciones profesionales en segundos</li>
+        <li>Revisa y publica con un clic</li>
       </ol>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4">Pricing</h2>
-      <div class="grid grid-cols-3 gap-4">
-        <div class="border rounded-lg p-4 text-center">
-          <h3 class="font-bold">Starter</h3>
-          <p class="text-2xl font-bold my-2">$9/mo</p>
-          <p class="text-sm text-gray-500">100 descriptions/mo</p>
-          <p class="text-sm text-gray-500">1 language</p>
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-2">Pricing</h2>
+      <p class="text-sm text-gray-600 mb-3">La app está en fase <strong>development / beta</strong>. Mientras tanto, es <strong>gratis</strong> para tu dev store.</p>
+      <p class="text-xs text-gray-500">Cuando se publique en el Shopify App Store, los planes serán:</p>
+      <div class="grid grid-cols-3 gap-3 mt-3 opacity-60">
+        <div class="border rounded-lg p-3 text-center bg-white">
+          <h3 class="font-bold text-sm">Starter</h3>
+          <p class="text-xl font-bold my-1">$9/mo</p>
+          <p class="text-xs text-gray-500">100 desc/mo · 1 idioma</p>
         </div>
-        <div class="border-2 border-blue-500 rounded-lg p-4 text-center relative">
-          <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-0.5 rounded">Popular</span>
-          <h3 class="font-bold">Pro</h3>
-          <p class="text-2xl font-bold my-2">$29/mo</p>
-          <p class="text-sm text-gray-500">1,000 descriptions/mo</p>
-          <p class="text-sm text-gray-500">3 languages</p>
+        <div class="border rounded-lg p-3 text-center bg-white">
+          <h3 class="font-bold text-sm">Pro</h3>
+          <p class="text-xl font-bold my-1">$29/mo</p>
+          <p class="text-xs text-gray-500">1,000 desc/mo · 3 idiomas</p>
         </div>
-        <div class="border rounded-lg p-4 text-center">
-          <h3 class="font-bold">Unlimited</h3>
-          <p class="text-2xl font-bold my-2">$49/mo</p>
-          <p class="text-sm text-gray-500">Unlimited descriptions</p>
-          <p class="text-sm text-gray-500">All languages</p>
+        <div class="border rounded-lg p-3 text-center bg-white">
+          <h3 class="font-bold text-sm">Unlimited</h3>
+          <p class="text-xl font-bold my-1">$49/mo</p>
+          <p class="text-xs text-gray-500">Ilimitado · todos los idiomas</p>
         </div>
       </div>
+      <p class="text-xs text-gray-400 mt-3 italic">Estos precios son mockup. Ningún cobro está siendo procesado ahora mismo.</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-6">
-      <h2 class="text-xl font-semibold mb-4">Try it</h2>
-      <textarea id="title" class="w-full border rounded-lg p-3 mb-3" rows="3" placeholder="Enter product title (e.g. 'Wireless Bluetooth Headphones')"></textarea>
-      <select id="lang" class="border rounded-lg p-2 mb-3 w-full">
-        <option value="es">Spanish</option>
-        <option value="en">English</option>
-        <option value="pt">Portuguese</option>
-      </select>
-      <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-2 rounded-lg" onclick="generateDesc()">
-        Generate Description
-      </button>
-      <div id="result" class="mt-4 p-4 bg-gray-100 rounded-lg hidden"></div>
+    <div class="text-center text-xs text-gray-400 mt-8 pb-4">
+      Built by <strong>AliceLabs LLC</strong> · Sheridan, Wyoming, USA · hello@alicelabs.site
     </div>
   </div>
 
   <script>
     async function generateDesc() {
-      const title = document.getElementById('title').value;
+      const title = document.getElementById('title').value.trim();
       const lang = document.getElementById('lang').value;
-      if (!title) return alert('Enter a product title');
+      if (!title) return alert('Escribe un título de producto');
 
       const r = document.getElementById('result');
       r.classList.remove('hidden');
-      r.innerHTML = 'Generating...';
+      r.innerHTML = '<span class="text-gray-500">Generando...</span>';
 
       try {
         const res = await fetch('/api/generate', {
@@ -258,7 +334,7 @@ function generateAppHTML(shop) {
           body: JSON.stringify({ title, language: lang })
         });
         const data = await res.json();
-        r.innerHTML = data.description || data.error || 'Error generating description';
+        r.innerHTML = data.description || data.error || 'Error generando descripción';
       } catch (e) {
         r.innerHTML = 'Error: ' + e.message;
       }
@@ -266,6 +342,26 @@ function generateAppHTML(shop) {
   </script>
 </body>
 </html>`;
+}
+
+function debugHTML(kvKeys, shop, envInfo) {
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Debug</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6 font-mono text-sm">
+<h1 class="text-2xl mb-4 text-green-400">Debug — Worker status</h1>
+<div class="mb-4"><strong>App URL:</strong> ${APP_URL}</div>
+<div class="mb-4"><strong>Shopify API version:</strong> ${SHOPIFY_API_VERSION}</div>
+<div class="mb-4"><strong>Scopes:</strong> <code class="text-xs break-all">${SCOPES}</code></div>
+<div class="mb-4"><strong>Env info:</strong> ${envInfo}</div>
+<div class="mb-4"><strong>Shop (from URL or cookie):</strong> ${shop || '(ninguno)'}</div>
+<div class="mb-4">
+  <strong>KV TOKENS contents:</strong>
+  <pre class="mt-2 p-3 bg-black rounded text-green-300">${kvKeys.length ? JSON.stringify(kvKeys, null, 2) : '(vacío — la app no está instalada todavía)'}</pre>
+</div>
+<div class="mt-6 p-3 bg-gray-800 rounded text-xs">
+  <p>Si KV está vacío pero la app está en el admin de Shopify, el flujo OAuth pudo haber fallado en el callback.</p>
+  <p class="mt-2">Reinstala desde: <code class="text-blue-300">/install?shop=TU-TIENDA.myshopify.com</code></p>
+</div>
+</body></html>`;
 }
 
 function installFormHTML() {
@@ -393,6 +489,9 @@ export default {
     globalThis.env_TOKENS = env.TOKENS || null;
     globalThis.SHOPIFY_CLIENT_ID = env.SHOPIFY_CLIENT_ID;
     globalThis.SHOPIFY_CLIENT_SECRET = env.SHOPIFY_CLIENT_SECRET;
+    globalThis.ZAI_TOKEN = env.ZAI_TOKEN;
+    globalThis.ZAI_CHAT_ID = env.ZAI_CHAT_ID;
+    globalThis.ZAI_USER_ID = env.ZAI_USER_ID;
 
     const url = new URL(request.url);
 
@@ -405,10 +504,30 @@ export default {
       return json({ description: desc });
     }
     if (url.pathname === '/' || url.pathname === '/app') {
-      const shop = (request.headers.get('Cookie') || '').match(/shop=([^;]+)/)?.[1] || '';
-      return new Response(generateAppHTML(shop), { headers: { 'Content-Type': 'text/html' } });
+      // Cuando la app está embedded en el admin de Shopify, el iframe recibe ?shop=...
+      // como parámetro de URL o cookie. Lo usamos para detectar la tienda.
+      const shopFromUrl = url.searchParams.get('shop') || '';
+      const shopFromCookie = (request.headers.get('Cookie') || '').match(/shop=([^;]+)/)?.[1] || '';
+      const shop = shopFromUrl || shopFromCookie;
+      const isEmbedded = url.searchParams.has('shop') || url.searchParams.has('host') || request.headers.get('Sec-Fetch-Dest') === 'iframe';
+      return new Response(generateAppHTML(shop, isEmbedded), { headers: { 'Content-Type': 'text/html' } });
     }
 
-    return json({ name: 'ai-product-descriptions', version: '1.1.0', endpoints: ['/install', '/auth/callback', '/webhooks/products', '/api/generate', '/app'] });
+    if (url.pathname === '/debug') {
+      const shopFromUrl = url.searchParams.get('shop') || '';
+      const shopFromCookie = (request.headers.get('Cookie') || '').match(/shop=([^;]+)/)?.[1] || '';
+      const shop = shopFromUrl || shopFromCookie;
+      let kvKeys = [];
+      try {
+        if (env.TOKENS && env.TOKENS.list) {
+          const result = await env.TOKENS.list();
+          kvKeys = result.keys || [];
+        }
+      } catch (e) { kvKeys = [{ error: e.message }]; }
+      const envInfo = `KV=${env.TOKENS ? 'yes' : 'no'}, CLIENT_ID=${env.SHOPIFY_CLIENT_ID ? 'set' : 'MISSING'}, CLIENT_SECRET=${env.SHOPIFY_CLIENT_SECRET ? 'set' : 'MISSING'}`;
+      return new Response(debugHTML(kvKeys, shop, envInfo), { headers: { 'Content-Type': 'text/html' } });
+    }
+
+    return json({ name: 'ai-product-descriptions', version: '1.2.0', endpoints: ['/install', '/auth/callback', '/webhooks/products', '/api/generate', '/app', '/debug'] });
   }
 };
