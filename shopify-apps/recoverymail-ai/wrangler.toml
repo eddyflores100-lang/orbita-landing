@@ -1,0 +1,16 @@
+name = "recoverymail-ai"
+main = "index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+APP_URL = "https://recoverymail-ai.eddyflores100.workers.dev"
+APP_NAME = "RecoveryMail AI"
+
+# Trigger for daily abandoned cart sweep
+[triggers]
+crons = ["0 9 * * *"]
+
+[[kv_namespaces]]
+binding = "STORE"
+id = "a6e0f6258d194ea794572472ca286d08"
