@@ -1,0 +1,6 @@
+import type {Metadata} from 'next';
+import {OrbitaNavbar} from '@/components/orbita-landing/OrbitaNavbar';
+import {OrbitaFooter} from '@/components/orbita-landing/OrbitaFooter';
+import s from '@/app/pilot.module.css';
+export const metadata:Metadata={title:'Muestra visual · La Floresta',description:'Video pregrabado de muestra. No es un anuncio de venta ni un recorrido 3D interactivo.'};
+export default function Demo(){return <main className={s.site}><OrbitaNavbar/><section className={s.section}><p className={s.eyebrow}>MUESTRA / LA FLORESTA</p><h1 style={{fontSize:44,fontFamily:'Georgia,serif'}}>Así puede presentarse una propiedad.</h1><p style={{margin:'25px 0'}}>Pieza pregrabada incluida en este proyecto. No acredita disponibilidad, precio ni características comerciales de un inmueble. Se presenta como referencia visual del piloto.</p><video controls playsInline preload="none" poster="/orbita/demo/poster.jpg" aria-label="Muestra de video La Floresta"><source src="/orbita/demo/la-floresta-3d.mp4" type="video/mp4"/></video><p className={s.note}>Presentación visual sin información verbal necesaria. <a href="/orbita/demo/la-floresta-3d.mp4">Abrir video directamente</a>.</p><div className={s.actions}><a className={s.primary} href="/#consulta">Consultar una pieza para mi propiedad ↗</a><a href="/">Volver al servicio</a></div></section><OrbitaFooter/></main>}

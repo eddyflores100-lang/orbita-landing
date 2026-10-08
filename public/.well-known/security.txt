@@ -1,9 +1,4 @@
-Contact: mailto:security@alicelabs.site
-Expires: 2027-12-31T23:59:59.000Z
-Encryption: https://alicelabs.site/.well-known/pgp.asc
-Acknowledgments: https://alicelabs.site/security/hall-of-fame
-Policy: https://alicelabs.site/security/policy
-Hiring: https://alicelabs.site/careers
-Signature: https://alicelabs.site/.well-known/security.txt.sig
+Contact: mailto:contact@alicelabs.site
+Expires: 2027-10-04T23:59:59.000Z
 Preferred-Languages: es, en
 Canonical: https://orbita.alicelabs.site/.well-known/security.txt

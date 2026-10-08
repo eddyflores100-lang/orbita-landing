@@ -9,10 +9,6 @@ export function GET() {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap><loc>${BASE_URL}/sitemap-main.xml</loc></sitemap>
-  <sitemap><loc>${BASE_URL}/sitemap-usa.xml</loc></sitemap>
-  <sitemap><loc>${BASE_URL}/sitemap-latam.xml</loc></sitemap>
-  <sitemap><loc>${BASE_URL}/sitemap-images.xml</loc></sitemap>
-  <sitemap><loc>${BASE_URL}/sitemap-news.xml</loc></sitemap>
 </sitemapindex>`
 
   return new NextResponse(body, {
